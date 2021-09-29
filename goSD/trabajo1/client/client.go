@@ -17,8 +17,11 @@ import (
     //"/home/raulrcuni/goSD/trabajo1/com"
     "example.com/com"
     //"flag"
-    "encoding/gob"
-    "bytes"
+    "encoding/binary"
+    //"bytes"
+    "bufio"
+	"log"
+	"strings"
 )
 
 type Message struct {
@@ -34,113 +37,128 @@ func checkError(err error) {
 	}
 }
 
-func send(conn net.Conn, intervalNew com.TPInterval) {
+func enviarPeticion(conn net.Conn, desde int, hasta int) {
+
+	fmt.Println("Enviar peticion de primos")
 	
-	MessageS := com.Request{Id: 1, Interval: intervalNew}
-	//MessageS := new(Request)
-	bin_buf := new(bytes.Buffer)
+	interval := []int{desde,hasta}
 	
-	gobobj := gob.NewEncoder(bin_buf)
-	
-	gobobj.Encode(MessageS)
-	
-	conn.Write(bin_buf.Bytes())
+	bs := make([]byte,4)
+	intervalSend := make([]byte, 2*4)
+	j:= 0
+	for i:= range interval{
+		binary.LittleEndian.PutUint32(bs, uint32(interval[i]))
+		for i:= range bs {
+			intervalSend[j + i] = bs[i]
+		}
+		j = j +4
+	}
+	conn.Write([]byte(intervalSend))
 }
 
-func recv(conn net.Conn) {
-	tmp := make([]byte, 500)
-	conn.Read(tmp)
+func recibirRespuesta(conn net.Conn) {
+	bs := make([]byte, 4)
+	//n := 1
+	buf := make([]byte, 4)
+	_, err := conn.Read(buf)
+	checkError(err)
+	nPrimes := binary.LittleEndian.Uint32(buf)
+	fmt.Println("El numero de primos recibidos es= ", nPrimes)
 	
-	tmpbuff := bytes.NewBuffer(tmp)
-	tmpstruct := new(com.Reply)
+	fmt.Println("Enviar OK al servidor")
+	binary.LittleEndian.PutUint32(bs, 1)
+	conn.Write([]byte(bs))	
 	
-	gobobj := gob.NewDecoder(tmpbuff)
-	gobobj.Decode(tmpstruct)
+	/*n = int(nPrimes)
+	fmt.Println("N ahora vale ", n)*/
 	
-	fmt.Println(tmpstruct)	
+	newVectPrimes := [] uint32{}
+	t2 := make([]byte, nPrimes*4)
+	_, err2 := conn.Read(t2)
+	checkError(err2)
+
+	fmt.Println("traduciendo los datos")
+	j := 0
+	for i:= 0; i < int(nPrimes); i++ {
+		for z:= 0; z < 4; z++{
+			bs[z] = t2[z+j]
+		}
+		newVectPrimes = append(newVectPrimes, binary.LittleEndian.Uint32(bs))
+		j = j + 4
+	}
+	fmt.Println(newVectPrimes)
+}
+
+
+func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string){
+	s := strings.Split(vectDirPort[pos],":")
+	ip = s[0] //La ip
+	puerto = s[1] //El puerto
+	return ip, puerto
+}
+
+func lecturaFichero(nameFile string) (vectDirPort [] string){
+	file, err := os.Open(nameFile)
+	
+	if err != nil {
+		log.Fatalf("Error when opening file: %s", err)
+	}
+	
+	fileScanner := bufio.NewScanner(file)
+	
+	//vectDirPort = [] string{}
+	
+	for fileScanner.Scan(){
+		//fmt.Println(fileScanner.Text())
+		vectDirPort = append(vectDirPort,fileScanner.Text())
+	}
+	
+	if err := fileScanner.Err(); err != nil {
+		log.Fatalf("Error while reading file: %s", err)
+	}
+	
+	file.Close()
+	return vectDirPort
 }
 
 func main(){
-	/*desde := flag.Int("desde",0,"primer valor del rango")
-	hasta := flag.Int("hasta",0,"ultimo valor del rango")
-	IPPort := flag.String("IPPort","","La IP destino y el puerto")
 	
-	flag.Parse()
-	fmt.Println("Desde = ", *desde)
-	fmt.Println("Hasta = ", *hasta)
-	fmt.Println("Destino = ", *IPPort)
+	vectDirPort := lecturaFichero("./ipClient.txt")
+	fmt.Println(vectDirPort)
+	ip, puerto := obtenerIPPuerto(vectDirPort,0)
+	fmt.Println("La IP es ", ip)
+	fmt.Println("El puerto es ", puerto)
 	
-	interval := com.TPInterval{*desde, *hasta}
-    	fmt.Println("Intervalo= ", interval)
-    	
-    	fmt.Print("Intentado establecer conexión\n")
-    	tcpAddr, err := net.ResolveTCPAddr("tcp", *IPPort)
-    	
-    	fmt.Println("Desde = ", *desde)
-	fmt.Println("Hasta = ", *hasta)
-	fmt.Println("Destino = ", *IPPort)
+	var desde int
+	fmt.Println("Elige desde")
+	fmt.Scanln(&desde)
 	
-	interval := com.TPInterval{*desde, *hasta}
-    	fmt.Println("Intervalo= ", interval)
-    	
-    	fmt.Print("Intentado establecer conexión\n")
-    	tcpAddr, err := net.ResolveTCPAddr("tcp", *IPPort)*/
-    	
-    	var desde int
-    	fmt.Print("Elige el rango de primos\n")
-    	fmt.Print("Desde = ")
-    	fmt.Scanln(&desde)
-    	var hasta int
-    	fmt.Print("Hasta = ")
-    	fmt.Scanln(&hasta)
-    	var ip string
-    	fmt.Print("Elige la ip del host = ")
-    	fmt.Scanln(&ip)
-    	var port string
-    	fmt.Print("Elige el puerto del host = ")
-    	fmt.Scanln(&port)
-    	
-    	fmt.Println("Desde = ", desde)
-	fmt.Println("Hasta = ", hasta)
-	fmt.Println("Destino = ", ip + ":" + port)
+	var hasta int
+	fmt.Println("Elige hasta")
+	fmt.Scanln(&hasta)
+	
+	/*fmt.Println("Desde = ", desde)
+	fmt.Println("Hasta = ", hasta)*/
 	
 	interval := com.TPInterval{desde, hasta}
     	fmt.Println("Intervalo= ", interval)
     	
     	fmt.Print("Intentado establecer conexión\n")
-    	tcpAddr, err := net.ResolveTCPAddr("tcp", ip + ":" + port)
-
-    	
+    	tcpAddr, err := net.ResolveTCPAddr("tcp", ip + ":" + puerto)
 	checkError(err)
 	fmt.Print("Conexion extablecida\n")
 
-	fmt.Print("Enviando datos\n")
+	fmt.Print("Enviando peticion conexion\n")
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	checkError(err)
 	
 	defer conn.Close()
 	
 	fmt.Print("Enviando datos\n")
-	send(conn,interval)
+	enviarPeticion(conn,desde,hasta)
 	fmt.Print("Datos enviados\n")
 		
 	fmt.Print("Recibiendo respuesta\n")	
-	recv(conn)
+	recibirRespuesta(conn)
 	fmt.Print("Respuesta recibida\n")
-	
-	/*Dirección IP y puerto por el que nos conectamos al servidor*/
-    //endpoint := "155.210.154.200:30000"
-    
-    // TODO: crear el intervalo solicitando dos números por teclado
-	/*TPInterval es un objeto definido en la propia conexión para asignar el rango pedido de 1000 a 7000(es un vector{primer numero,ultimo numero})*/
-    /*interval := com.TPInterval{1000, 70000}*/
-	
-	/*Para establecer la configruación de la conexión al determinado servidor con cierta IP y PUERTO*/
-    //tcpAddr, err := net.ResolveTCPAddr("tcp", endpoint)
-    //checkError(err)
-
-    //conn, err := net.DialTCP("tcp", nil, tcpAddr)
-    //checkError(err)
-
-    // la variable conn es de tipo *net.TCPconn
 }
