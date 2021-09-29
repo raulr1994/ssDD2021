@@ -22,6 +22,7 @@ import (
     "bufio"
 	"log"
 	"strings"
+	"strconv"
 )
 
 type Message struct {
@@ -90,11 +91,15 @@ func recibirRespuesta(conn net.Conn) {
 }
 
 
-func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string){
+func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string, desde int, hasta int){
 	s := strings.Split(vectDirPort[pos],":")
 	ip = s[0] //La ip
 	puerto = s[1] //El puerto
-	return ip, puerto
+	desde, err := strconv.Atoi(s[2])
+	fmt.Println(err)
+	hasta , err = strconv.Atoi(s[3])
+	fmt.Println(err)
+	return ip, puerto, desde, hasta
 }
 
 func lecturaFichero(nameFile string) (vectDirPort [] string){
@@ -122,23 +127,14 @@ func lecturaFichero(nameFile string) (vectDirPort [] string){
 }
 
 func main(){
-	
 	vectDirPort := lecturaFichero("./ipClient.txt")
 	fmt.Println(vectDirPort)
-	ip, puerto := obtenerIPPuerto(vectDirPort,0)
+	ip, puerto, desde, hasta := obtenerIPPuerto(vectDirPort,0)
 	fmt.Println("La IP es ", ip)
 	fmt.Println("El puerto es ", puerto)
 	
-	var desde int
-	fmt.Println("Elige desde")
-	fmt.Scanln(&desde)
-	
-	var hasta int
-	fmt.Println("Elige hasta")
-	fmt.Scanln(&hasta)
-	
-	/*fmt.Println("Desde = ", desde)
-	fmt.Println("Hasta = ", hasta)*/
+	fmt.Println("Desde = ", desde)
+	fmt.Println("Hasta = ", hasta)
 	
 	interval := com.TPInterval{desde, hasta}
     	fmt.Println("Intervalo= ", interval)
