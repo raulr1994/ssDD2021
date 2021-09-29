@@ -10,7 +10,7 @@
 package main
 
 import (
-	"encoding/gob"
+	//"encoding/gob"
 	"fmt"
 	"net"
 	"os"
@@ -18,8 +18,12 @@ import (
 	//"./com"
 	"example.com/com"
 	//"flag"
-	"bytes"
-	"time"
+	//"bytes"
+	//"time"
+	"encoding/binary"
+	"bufio"
+	"log"
+	"strings"
 )
 
 /*
@@ -75,82 +79,143 @@ func logerr(err error) bool {
 }
 
 func read(conn net.Conn) (interval com.TPInterval){
-	tmp := make([]byte, 500)
-	//interval := new(com.TPInterval)
-	for{
-		_, err := conn.Read(tmp)
+	fmt.Println("Leyendo intervalo")
+	//for{
+		/*buf := make([]byte, 1024)
+		_, err := conn.Read(buf)
 		if logerr(err){
 			break
+		}*/
+		/*fmt.Println("Leido el buffer")
+		data := binary.LittleEndian.Uint32(buf)
+		fmt.Println(data)*/
+		var intervalV[2] uint32
+		t2 := make([]byte, 2*4)
+		
+		bufferPrimesB := make([]byte, 2*4)
+		_, err := conn.Read(bufferPrimesB)
+		checkError(err)
+		
+		t2 = bufferPrimesB
+		bs := make([]byte, 4)
+		fmt.Println("traduciendo los datos")
+		j := 0
+		for i := 0; i < 2; i++ {
+			for z := 0; z < 4; z++ {
+				bs[z] = t2[z+j]
+			}
+			intervalV[i] = binary.LittleEndian.Uint32(bs)
+			j = j + 4
 		}
 		
-		tmpbuff := bytes.NewBuffer(tmp)
-		tmpstruct := new(com.Request)
-		
-		gobobj := gob.NewDecoder(tmpbuff)
-		gobobj.Decode(tmpstruct)
-		
-		interval = (tmpstruct.Interval)
-		
-		fmt.Println(tmpstruct.Interval)
-	}
+		/*n := int64(data)
+		fmt.Println("Hasta= ",int(n))*/
+		fmt.Println("El intervalo pedido es ", intervalV)
+		newInterval := com.TPInterval{A:int(intervalV[0]),B:int(intervalV[1])}
+		interval = newInterval
+	//}
 	return interval
 }
 
 func resp(conn net.Conn, listPrimes []int){
-	MessageR := com.Reply{Id: 2,Primes: listPrimes}
-	bin_buf := new(bytes.Buffer)
+	bs := make([]byte,4)
+	binary.LittleEndian.PutUint32(bs,uint32(len(listPrimes)))
+	fmt.Println("Enviando el numero de primos encontrados ", len(listPrimes))
+	conn.Write([]byte(bs))
 	
-	gobobje := gob.NewEncoder(bin_buf)
-	gobobje.Encode(MessageR)
+	buf := make([]byte, 1024)
+	_, err := conn.Read(buf)
+	checkError(err)
+	fmt.Println("Recibido OK del cliente")
+	data := binary.LittleEndian.Uint32(buf)
+	fmt.Println(data)
 	
-	conn.Write(bin_buf.Bytes())
+	vectorPrimes := make([]byte, len(listPrimes)*4)
+	j := 0
+	for i := range listPrimes {
+		binary.LittleEndian.PutUint32(bs, uint32(listPrimes[i]))
+		for i:= range bs {
+			vectorPrimes[j + i] = bs[i]
+		}
+		j = j + 4
+	}
+	conn.Write([]byte(vectorPrimes))
+	
 	conn.Close()
 }
 
 func handle(conn net.Conn){
 	//defer conn.Close()
-	timeoutDuration := 2*time.Second
+	/*timeoutDuration := 2*time.Second
 	fmt.Println("Iniciando servidor")
-	conn.SetReadDeadline(time.Now().Add(timeoutDuration))
+	conn.SetReadDeadline(time.Now().Add(timeoutDuration))*/
 	
 	remoteAddr := conn.RemoteAddr().String()
 	fmt.Println("Cliente conectado desde " + remoteAddr)
 	//conn.Close()
 	interval := read(conn)
+	fmt.Println(interval)
 	newPrimes := FindPrimes(interval)
+	fmt.Println("El numero de primos encontrados es ", len(newPrimes))
 	fmt.Println("Los primos encontrados son")
 	fmt.Println(newPrimes)
 	resp(conn,newPrimes)
 }
 
+func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string){
+	s := strings.Split(vectDirPort[pos],":")
+	ip = s[0] //La ip
+	puerto = s[1] //El puerto
+	return ip, puerto
+}
+
+func lecturaFichero(nameFile string) (vectDirPort [] string){
+	file, err := os.Open(nameFile)
+	
+	if err != nil {
+		log.Fatalf("Error when opening file: %s", err)
+	}
+	
+	fileScanner := bufio.NewScanner(file)
+	
+	//vectDirPort = [] string{}
+	
+	for fileScanner.Scan(){
+		//fmt.Println(fileScanner.Text())
+		vectDirPort = append(vectDirPort,fileScanner.Text())
+	}
+	
+	if err := fileScanner.Err(); err != nil {
+		log.Fatalf("Error while reading file: %s", err)
+	}
+	
+	file.Close()
+	return vectDirPort
+}
+
 func main() {
-	//prot := flag.String("prot","","El protocolo para transmitir")
-	//iphost := flag.String("iphost","","La ip del host")
 	//port := flag.String("port","","El puerto de escucha")
+	vectDirPort := lecturaFichero("./ipServer.txt")
+	fmt.Println(vectDirPort)
+	ip, puerto := obtenerIPPuerto(vectDirPort,0)
+	fmt.Println("La IP es ", ip)
+	fmt.Println("El puerto es ", puerto)
 	
 	/*Usando el protocolo CONN_TYPE a la dirección/es CONN_HOST por medio del puerto CONN_PORT*/
-	//fmt.Print("En espera\n")
-	//listener, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
-	//listener, err := net.Listen(*prot, (*iphost) +":"+ (*port))
-	//listener, err := net.Listen("tcp", "192.168.1.0:2000")
-	//listener, err := net.Listen("tcp", (*iphost) +":"+ (*port))
-	//listener, err := net.Listen("tcp", ":30000")
-	var port string
-	fmt.Print("Elige el puerto= ")
-	fmt.Scanln(&port)
-	fmt.Print("En espera\n")
-	listener, err := net.Listen("tcp", ":"+ port)
+	/*flag.Parse()*/
+	fmt.Println("En espera por el puerto ", puerto)
+
+	listener, err := net.Listen("tcp", ":"+ puerto)
 	/*Comprueba si se ha producido un error en la conexión*/
 	checkError(err)
 	
 	/*Se pone en espera para decibir una llamada y devuelve una conexion genérica conn*/
 	conn, err := listener.Accept()
-	fmt.Print("Cliente escuchado\n")
+	fmt.Println("Cliente escuchado\n")
 	/*Nos aseguramos que cuando se acabe la tarea, se cierre la conexión entre el emisor y el receptor*/
-	//defer conn.Close()
+	defer conn.Close()
 	checkError(err)
-	
+
 	handle(conn) //go quitado
-	
-    // TO DO
+	fmt.Println("Servidor finalizado ")
 }
