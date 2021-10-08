@@ -50,15 +50,15 @@ func main(){
  		case 1:
  			executeComand(nombreusuario,ipjhost,"rm -f ./client")
  			executeComand(nombreusuario,ipjhost,"rm -f ./ipClient.txt")
- 			executeComand(nombreusuario,ipjhost,"wget https://raw.githubusercontent.com/raulr1994/ssDD2021/main/goSD/trabajo1/client/client")
- 			executeComand(nombreusuario,ipjhost,"wget https://raw.githubusercontent.com/raulr1994/ssDD2021/main/goSD/trabajo1/client/ipClient.txt")
+ 			executeComand(nombreusuario,ipjhost,"wget https://raw.githubusercontent.com/raulr1994/ssDD2021/main/practica1/1cliente-servidor/Client/client")
+ 			executeComand(nombreusuario,ipjhost,"wget https://raw.githubusercontent.com/raulr1994/ssDD2021/main/practica1/1cliente-servidor/Client/ipClient.txt")
  			executeComand(nombreusuario,ipjhost,"chmod 777 ./client")
  		case 2:
- 			executeComand(nombreusuario,ipjhost,"rm -f ./server")
+ 			executeComand(nombreusuario,ipjhost,"rm -f ./server-draft")
  			executeComand(nombreusuario,ipjhost,"rm -f ./ipServer.txt")
- 			executeComand(nombreusuario,ipjhost,"wget https://raw.githubusercontent.com/raulr1994/ssDD2021/main/goSD/trabajo1/server/server")
- 			executeComand(nombreusuario,ipjhost,"wget https://raw.githubusercontent.com/raulr1994/ssDD2021/main/goSD/trabajo1/server/ipServer.txt")
- 			executeComand(nombreusuario,ipjhost,"chmod 777 ./server")
+ 			executeComand(nombreusuario,ipjhost,"wget https://raw.githubusercontent.com/raulr1994/ssDD2021/main/practica1/1cliente-servidor/Server/server-draft")
+ 			executeComand(nombreusuario,ipjhost,"wget https://raw.githubusercontent.com/raulr1994/ssDD2021/main/practica1/1cliente-servidor/Server/ipServer.txt")
+ 			executeComand(nombreusuario,ipjhost,"chmod 777 ./server-draft")
  		case 3:
  			executeComand(nombreusuario,ipjhost,"./client")
  		case 4:

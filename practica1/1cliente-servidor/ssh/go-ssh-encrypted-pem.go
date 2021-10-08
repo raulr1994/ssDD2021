@@ -63,16 +63,16 @@ func (s *SshClient) RunCommand(cmd string) (string, error) {
 	fmt.Println(s.Config)
 	
 	/*var hostKey ssh.PublicKey*/
-	config := &ssh.ClientConfig{
+	/*config := &ssh.ClientConfig{
 		User: "a715657",
 		Auth: []ssh.AuthMethod{
 			ssh.Password("bunkma29"),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		//HostKeyCallback: ssh.FixedHostKey(hostKey),
-	}
+	}*/
 	
-	conn, err := ssh.Dial("tcp", s.Server, config /*s.Config*/)
+	conn, err := ssh.Dial("tcp", s.Server, /*config*/ s.Config)
 	if err != nil {
 		return "", fmt.Errorf("Dial to %v failed %v", s.Server, err)
 	}
