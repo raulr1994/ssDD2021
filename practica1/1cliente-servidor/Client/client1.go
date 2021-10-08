@@ -12,10 +12,14 @@ import (
     "fmt"
     "time"
     "encoding/gob"
-    //"com"
-    "example.com/com"
+    //"./com"
     "os"
     "net"
+    "example.com/com"
+     "bufio"
+	"log"
+	"strings"
+	"strconv"
 )
 
 func checkError(err error) {
@@ -32,21 +36,12 @@ func checkError(err error) {
 // temporal. Para evitar condiciones de carrera, la estructura de datos compartida se almacena en una Goroutine
 // (handleRequests) y que controla los accesos a través de canales síncronos. En este caso, se añade una nueva
 // petición a la estructura de datos mediante el canal addChan
-func sendRequest(endpoint string, id int, interval com.TPInterval, addChan chan com.TimeRequest, delChan chan com.TimeReply){
-    tcpAddr, err := net.ResolveTCPAddr("tcp", endpoint)
-    checkError(err)
-
-    conn, err := net.DialTCP("tcp", nil, tcpAddr)
-    checkError(err)
-
-    encoder := gob.NewEncoder(conn)
-    decoder := gob.NewDecoder(conn)
+func sendRequest(id int, interval com.TPInterval, encoder *gob.Encoder, addChan chan com.TimeRequest){
     request := com.Request{id, interval}
     timeReq := com.TimeRequest{id, time.Now()}
-    err = encoder.Encode(request)
+    err := encoder.Encode(request)
     checkError(err)
     addChan <- timeReq
-    go receiveReply(decoder, delChan, conn)
 }
 
 // handleRequests es una Goroutine que garantiza el acceso en exclusión mutua a la tabla de peticiones. La tabla de peticiones
@@ -75,31 +70,92 @@ func handleRequests(addChan chan com.TimeRequest, delChan chan com.TimeReply) {
 // temporal. Para evitar condiciones de carrera, la estructura de datos compartida se almacena en una Goroutine
 // (handleRequests) y que controla los accesos a través de canales síncronos. En este caso, se añade una nueva
 // petición a la estructura de datos mediante el canal addChan
-func receiveReply(decoder *gob.Decoder, delChan chan com.TimeReply, conn net.Conn){
+func receiveReply(decoder *gob.Decoder, delChan chan com.TimeReply){
+    for {
         var reply com.Reply
         err := decoder.Decode(&reply)
+        fmt.Print("Recibido algo \n")
         checkError(err)
+        fmt.Print(reply, " \n")
         timeReply := com.TimeReply{reply.Id, time.Now()}
         delChan <- timeReply 
-	conn.Close()
+    }
+}
+
+func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string, desde int, hasta int){
+	s := strings.Split(vectDirPort[pos],":")
+	ip = s[0] //La ip
+	puerto = s[1] //El puerto
+	desde, err := strconv.Atoi(s[2]) //Desde
+	fmt.Println(err)
+	hasta , err = strconv.Atoi(s[3]) //Hasta
+	fmt.Println(err)
+	return ip, puerto, desde, hasta
+}
+
+func lecturaFichero(nameFile string) (vectDirPort [] string){
+	file, err := os.Open(nameFile)
+	
+	if err != nil {
+		log.Fatalf("Error when opening file: %s", err)
+	}
+	
+	fileScanner := bufio.NewScanner(file)
+	
+	//vectDirPort = [] string{}
+	
+	for fileScanner.Scan(){
+		//fmt.Println(fileScanner.Text())
+		vectDirPort = append(vectDirPort,fileScanner.Text())
+	}
+	
+	if err := fileScanner.Err(); err != nil {
+		log.Fatalf("Error while reading file: %s", err)
+	}
+	
+	file.Close()
+	return vectDirPort
 }
 
 func main(){
-    endpoint := "192.168.1.2:30000"
-    numIt := 10
-    requestTmp := 6
-    interval := com.TPInterval{1000, 70000}
-    tts := 3000 // time to sleep between consecutive requests
+	vectDirPort := lecturaFichero("./ipClient.txt")
+	fmt.Println(vectDirPort)
+	ip, puerto, desde, hasta := obtenerIPPuerto(vectDirPort,0)
+	fmt.Println("La IP es ", ip)
+	fmt.Println("El puerto es ", puerto)
+	fmt.Println("Desde = ", desde)
+	fmt.Println("Hasta = ", hasta)
+	
+	interval := com.TPInterval{desde, hasta}
+    	fmt.Println("Intervalo= ", interval)
+    	
+	numIt := 10
+	requestTmp :=  6
+	//interval := com.TPInterval{1000, 70000}
+	tts := 3000 // time to sleep between consecutive requests
+	    
+	fmt.Print("Intentado establecer conexión con el servidor " + ip + ":" + puerto + "\n")
+	tcpAddr, err := net.ResolveTCPAddr("tcp", ip + ":" + puerto)
+	checkError(err)
 
-    addChan := make(chan com.TimeRequest)
-    delChan := make(chan com.TimeReply)
+	conn, err := net.DialTCP("tcp", nil, tcpAddr)
+	checkError(err)
 
-    go handleRequests(addChan, delChan)
-    
-    for i := 0; i < numIt; i++ {
-        for t := 1; t <= requestTmp; t++{
-            sendRequest(endpoint, i * requestTmp + t, interval, addChan, delChan)
-        }
-        time.Sleep(time.Duration(tts) * time.Millisecond)
-    }
+	defer conn.Close()
+	
+	encoder := gob.NewEncoder(conn)
+	decoder := gob.NewDecoder(conn)
+	    
+	addChan := make(chan com.TimeRequest)
+	delChan := make(chan com.TimeReply)
+
+	go receiveReply(decoder, delChan)
+	go handleRequests(addChan, delChan)
+	    
+	for i := 0; i < numIt; i++ {
+		for t := 1; t <= requestTmp; t++{
+			sendRequest(i * requestTmp + t, interval, encoder, addChan)
+		}
+		time.Sleep(time.Duration(tts) * time.Millisecond)
+	 }
 }
