@@ -16,12 +16,18 @@ import (
 
 
 func executeComand (nombreusuario string, ipjhost string, comand string) {
-	ssh, err := sshcode.NewSshClient(
+	/*ssh, err := sshcode.NewSshClient(
 		"a715657",
 		"155.210.154.205",
 		22,
 		"/root/.ssh/id_rsa",//"/Users/some-user/.ssh/id_rsa",
-		"bunkma29")
+		"")*/
+	ssh, err := sshcode.NewSshClient(
+		nombreusuario,
+		ipjhost,
+		22,
+		"./rsa",//"/root/.ssh/id_rsa",//"/Users/some-user/.ssh/id_rsa",
+		"")
 
 	if err != nil {
 			log.Printf("SSH init error %v", err)
@@ -63,7 +69,7 @@ func main(){
  			executeComand(nombreusuario,ipjhost,"./client")
  		case 4:
 
- 			executeComand(nombreusuario,ipjhost,"./server")
+ 			executeComand(nombreusuario,ipjhost,"./server-draft")
  		case 5:
  			//executeComand(nombreusuario,ipjhost,"./hello -port 23")
  			executeComand(nombreusuario,ipjhost,"ls")
