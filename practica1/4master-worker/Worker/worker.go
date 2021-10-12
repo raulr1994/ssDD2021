@@ -119,13 +119,44 @@ func onWorkers(id int){
 	}
 }
 
+func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string){
+	s := strings.Split(vectDirPort[pos],":")
+	ip = s[0] //La ip
+	puerto = s[1] //El puerto
+	return ip, puerto
+}
+
+func lecturaFichero(nameFile string) (vectDirPort [] string){
+	file, err := os.Open(nameFile)
+	
+	if err != nil {
+		log.Fatalf("Error when opening file: %s", err)
+	}
+	
+	fileScanner := bufio.NewScanner(file)
+	
+	//vectDirPort = [] string{}
+	
+	for fileScanner.Scan(){
+		//fmt.Println(fileScanner.Text())
+		vectDirPort = append(vectDirPort,fileScanner.Text())
+	}
+	
+	if err := fileScanner.Err(); err != nil {
+		log.Fatalf("Error while reading file: %s", err)
+	}
+	
+	file.Close()
+	return vectDirPort
+}
+
 func main() {
-	vectDirPort := lecturaFichero("./ipServer.txt")
+	vectDirPort := lecturaFichero("./ipWorker.txt")
 	fmt.Println(vectDirPort)
 	ip, puerto := obtenerIPPuerto(vectDirPort,0)
 	fmt.Println("La IP es ", ip)
 	fmt.Println("El puerto es ", puerto)
-	fmt.Println("En espera por el puerto ", puerto)
+	
 	
 	nWorkers := 3
 	
@@ -134,6 +165,7 @@ func main() {
 		go onWorkers(i)
 	}
 	
+	fmt.Println("En espera por el puerto ", puerto)
 	listener, err := net.Listen("tcp", ":"+puerto)
 	checkError(err)
 	fin := false
