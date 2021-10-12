@@ -16,10 +16,6 @@ import (
     "example.com/com"
     "os"
     "net"
-    "bufio"
-	"log"
-	"strings"
-	"strconv"
 )
 
 func checkError(err error) {
@@ -37,7 +33,6 @@ func checkError(err error) {
 // (handleRequests) y que controla los accesos a través de canales síncronos. En este caso, se añade una nueva
 // petición a la estructura de datos mediante el canal addChan
 func sendRequest(endpoint string, id int, interval com.TPInterval, addChan chan com.TimeRequest, delChan chan com.TimeReply){
-	idRequest := id
     tcpAddr, err := net.ResolveTCPAddr("tcp", endpoint)
     checkError(err)
 
@@ -46,8 +41,8 @@ func sendRequest(endpoint string, id int, interval com.TPInterval, addChan chan 
 
     encoder := gob.NewEncoder(conn)
     decoder := gob.NewDecoder(conn)
-    request := com.Request{idRequest/*id*/, interval}
-    timeReq := com.TimeRequest{idRequest/*id*/, time.Now()}
+    request := com.Request{id, interval}
+    timeReq := com.TimeRequest{id, time.Now()}
     err = encoder.Encode(request)
     checkError(err)
     addChan <- timeReq
@@ -89,60 +84,11 @@ func receiveReply(decoder *gob.Decoder, delChan chan com.TimeReply, conn net.Con
 	conn.Close()
 }
 
-func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string, desde int, hasta int){
-	s := strings.Split(vectDirPort[pos],":")
-	ip = s[0] //La ip
-	puerto = s[1] //El puerto
-	desde, err := strconv.Atoi(s[2]) //Desde
-	fmt.Println(err)
-	hasta , err = strconv.Atoi(s[3]) //Hasta
-	fmt.Println(err)
-	return ip, puerto, desde, hasta
-}
-
-func lecturaFichero(nameFile string) (vectDirPort [] string){
-	file, err := os.Open(nameFile)
-	
-	if err != nil {
-		log.Fatalf("Error when opening file: %s", err)
-	}
-	
-	fileScanner := bufio.NewScanner(file)
-	
-	//vectDirPort = [] string{}
-	
-	for fileScanner.Scan(){
-		//fmt.Println(fileScanner.Text())
-		vectDirPort = append(vectDirPort,fileScanner.Text())
-	}
-	
-	if err := fileScanner.Err(); err != nil {
-		log.Fatalf("Error while reading file: %s", err)
-	}
-	
-	file.Close()
-	return vectDirPort
-}
-
 func main(){
-    //endpoint := "192.168.1.2:30000"
-    
-   	vectDirPort := lecturaFichero("./ipClient.txt")
-	fmt.Println(vectDirPort)
-	ip, puerto, desde, hasta := obtenerIPPuerto(vectDirPort,0)
-	fmt.Println("La IP es ", ip)
-	fmt.Println("El puerto es ", puerto)
-	fmt.Println("Desde = ", desde)
-	fmt.Println("Hasta = ", hasta)
-	
-	interval := com.TPInterval{desde, hasta}
-	//interval := com.TPInterval{1, 7000}
-
-    	fmt.Println("Intervalo= ", interval)
-    	
+    endpoint := "192.168.1.2:30000"
     numIt := 10
     requestTmp := 6
-    
+    interval := com.TPInterval{1000, 70000}
     tts := 3000 // time to sleep between consecutive requests
 
     addChan := make(chan com.TimeRequest)
@@ -152,7 +98,7 @@ func main(){
     
     for i := 0; i < numIt; i++ {
         for t := 1; t <= requestTmp; t++{
-            sendRequest(/*endpoint*/ip+":"+puerto, i * requestTmp + t, interval, addChan, delChan)
+            sendRequest(endpoint, i * requestTmp + t, interval, addChan, delChan)
         }
         time.Sleep(time.Duration(tts) * time.Millisecond)
     }
