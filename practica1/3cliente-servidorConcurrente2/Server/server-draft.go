@@ -69,21 +69,22 @@ func logerr(err error) bool {
 	return false
 }
 
-func read(conn net.Conn) (interval com.TPInterval){
+func read(conn net.Conn) (idProcess int, interval com.TPInterval){
 	decoder := gob.NewDecoder(conn)
 	var request com.Request
 	//for{
 		err := decoder.Decode(&request)
-		checkError(err)		
+		checkError(err)
+		idProcess = (request.Id)		
 		interval = (request.Interval)
 		
 		fmt.Println(interval)
 	//}
-	return interval
+	return idProcess, interval
 }
 
-func resp(conn net.Conn, listPrimes []int){
-	MessageR := com.Reply{Id: 2,Primes: listPrimes}
+func resp(conn net.Conn, listPrimes []int, id int){
+	MessageR := com.Reply{Id: id,Primes: listPrimes}
 	fmt.Println("Mensaje de vuelta: ", MessageR)
 	encoder := gob.NewEncoder(conn)
 	//for{
@@ -100,11 +101,11 @@ func handle(conn net.Conn){
 	
 	remoteAddr := conn.RemoteAddr().String()
 	fmt.Println("Cliente conectado desde " + remoteAddr)
-	interval := read(conn)
+	id,interval := read(conn)
 	newPrimes := FindPrimes(interval)
 	fmt.Println("Los primos encontrados son")
 	fmt.Println(newPrimes)
-	resp(conn,newPrimes)
+	resp(conn,newPrimes,id)
 }
 
 func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string){
@@ -138,61 +139,15 @@ func lecturaFichero(nameFile string) (vectDirPort [] string){
 	return vectDirPort
 }
 
-func onWorkers(id int, reqChan chan com.Request, repChan chan com.Reply){
-	for{
-		request := <- reqChan
-		fmt.Println("Worker con el id ", id, " procesando peticion" , request)
-		primes := []int{1,2,3,4,5}
-		replyTest := com.Reply{Id: 2,Primes: primes}
-		repChan <- replyTest
-	}
-}
 
+var jobs = make(chan net.Conn)
 
-
-type Job struct {
-	Conn		net.Conn
-	Request	com.Request
-}
-
-type Result struct {
-	Conn		net.Conn
-	Reply		com.Reply
-}
-
-func readRequest(conn net.Conn) (request com.Request){
-	decoder := gob.NewDecoder(conn)
-	var request com.Request
-	//for{
-		err := decoder.Decode(&request)
-		checkError(err)		
-		request = (request.Interval)
-		
-		fmt.Println(interval)
-	//}
-	return request
-}
-
-func respRequest(MessageR com.Reply){
-	fmt.Println("Mensaje de vuelta: ", MessageR)
-	encoder := gob.NewEncoder(conn)
-	//for{
-		err := encoder.Encode(MessageR)
-		checkError(err)
-	//}
-	//conn.Close()
-}
-
-func handleRequests(conn net.Conn, reqChan chan Job, repChan chan Result){
-	for{
-		//Obtener datos peticion
-		NewRequest := readRequest(conn)
-		RequestToWorker := Job{Conn: conn, Request: NewRequest}
-		//Mandar a worker datos
-		reqChan <- RequestToWorker
-		//Recibir resultados del worker(i)
-		reply := <- repChan
-		//Responder
+func onWorkers(id int){
+	idWorker := id
+	
+	for job := range jobs {
+		fmt.Println("Trabajando con el worker ", idWorker)
+		handle(job)
 	}
 }
 
@@ -206,25 +161,13 @@ func main() {
 	
 	nWorkers := 3
 	
-	reqChan := make(chan Job)
-	repChan := make(chan Result)
+	/*reqChan := make(chan Job)
+	repChan := make(chan Result)*/
 	
 	for i:= 0; i < nWorkers; i++ {
 		fmt.Println("Creando el worker ", i)
-		go onWorkers(i, reqChan, repChan)
+		go onWorkers(i)
 	}
-	
-	/*interval := com.TPInterval{10,70}
-	requestTest := com.Request{Id: 2, Interval: interval}
-	reqChan <- requestTest
-	reply := <- repChan
-	fmt.Println("Resultado obtenido ", reply)
-	reqChan <- requestTest
-	reply = <- repChan
-	fmt.Println("Resultado obtenido ", reply)
-	reqChan <- requestTest
-	reply = <- repChan
-	fmt.Println("Resultado obtenido ", reply)*/
 	
 	listener, err := net.Listen("tcp", ":"+puerto)
 	checkError(err)
@@ -233,7 +176,7 @@ func main() {
 		conn, err := listener.Accept()
 		checkError(err)
 		defer conn.Close()
-		go handleRequests(conn)
+		jobs <- conn
 	}
 	fmt.Println("Servidor finalizado ")
 }
