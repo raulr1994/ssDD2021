@@ -21,7 +21,7 @@ import (
 	"log"
 	"strings"
 	//"strconv"
-	"bytes"
+	//"bytes"
 	"time"
 )
 
@@ -69,37 +69,28 @@ func logerr(err error) bool {
 	return false
 }
 
-func read(conn net.Conn) (interval com.TPInterval){
-	tmp := make([]byte, 500)
-	//interval := new(com.TPInterval)
-	for{
-		_, err := conn.Read(tmp)
-		if logerr(err){
-			break
-		}
+func read(conn net.Conn) (idProcess int, interval com.TPInterval){
+	decoder := gob.NewDecoder(conn)
+	var request com.Request
+	
+	err := decoder.Decode(&request)
+	checkError(err)
+	idProcess = (request.Id)		
+	interval = (request.Interval)
 		
-		tmpbuff := bytes.NewBuffer(tmp)
-		tmpstruct := new(com.Request)
+	fmt.Println(interval)
 		
-		gobobj := gob.NewDecoder(tmpbuff)
-		gobobj.Decode(tmpstruct)
-		
-		interval = (tmpstruct.Interval)
-		
-		fmt.Println(tmpstruct.Interval)
-	}
-	return interval
+	return idProcess, interval
 }
 
-func resp(conn net.Conn, listPrimes []int){
-	MessageR := com.Reply{Id: 2,Primes: listPrimes}
-	bin_buf := new(bytes.Buffer)
-	
-	gobobje := gob.NewEncoder(bin_buf)
-	gobobje.Encode(MessageR)
-	
-	conn.Write(bin_buf.Bytes())
-	conn.Close()
+func resp(conn net.Conn, listPrimes []int, id int){
+	MessageR := com.Reply{Id: id,Primes: listPrimes}
+	//fmt.Println("Mensaje de vuelta: ", MessageR)
+	fmt.Println("Enviando al cliente el resultado")
+	encoder := gob.NewEncoder(conn)
+
+	err := encoder.Encode(MessageR)
+	checkError(err)
 }
 
 func handle(conn net.Conn){
@@ -109,11 +100,12 @@ func handle(conn net.Conn){
 	
 	remoteAddr := conn.RemoteAddr().String()
 	fmt.Println("Cliente conectado desde " + remoteAddr)
-	interval := read(conn)
+	id,interval := read(conn)
 	newPrimes := FindPrimes(interval)
-	fmt.Println("Los primos encontrados son")
-	fmt.Println(newPrimes)
-	resp(conn,newPrimes)
+	fmt.Println(len(newPrimes), " primos encontrados")
+	//fmt.Println(newPrimes)
+	resp(conn,newPrimes,id)
+	conn.Close()
 }
 
 func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string){
@@ -154,14 +146,16 @@ func main() {
 	fmt.Println("La IP es ", ip)
 	fmt.Println("El puerto es ", puerto)
 	fmt.Println("En espera por el puerto ", puerto)
-	listener, err := net.Listen("tcp", ip+":"+puerto)
+	listener, err := net.Listen("tcp", ":"+puerto)
 	checkError(err)
+	
 	fin := false
 	for !fin {
 		conn, err := listener.Accept()
-		defer conn.Close()
 		checkError(err)
+		defer conn.Close()
 		handle(conn)
+		fmt.Println("Cliente respondido")
 	}
 	fmt.Println("Servidor finalizado ")
 }
