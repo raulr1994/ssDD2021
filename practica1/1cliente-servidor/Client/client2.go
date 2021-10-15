@@ -144,7 +144,7 @@ func main(){
     numIt := 10
     requestTmp := 6
     
-    tts := 3000 // time to sleep between consecutive requests
+    tts := 3000*3 // time to sleep between consecutive requests
 
     addChan := make(chan com.TimeRequest)
     delChan := make(chan com.TimeReply)
