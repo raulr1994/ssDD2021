@@ -2,6 +2,7 @@
 * AUTOR: Raúl Rustarazo Carmona
 * ASIGNATURA: 30221 Sistemas Distribuidos del Grado en Ingeniería Informática
 *			Escuela de Ingeniería y Arquitectura - Universidad de Zaragoza
+* NIA:715657
 * FECHA: octubre de 2021
 * FICHERO: client.go
 * DESCRIPCIÓN: cliente completo para los cuatro escenarios de la práctica 1
@@ -143,7 +144,7 @@ func main(){
     numIt := 10
     requestTmp := 6
     
-    tts := 3000 // time to sleep between consecutive requests
+    tts := 3000*3 // time to sleep between consecutive requests
 
     addChan := make(chan com.TimeRequest)
     delChan := make(chan com.TimeReply)
