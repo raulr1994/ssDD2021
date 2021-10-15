@@ -1,12 +1,11 @@
 /*
-* AUTOR: Raúl Rustarazo Carmona
+* AUTOR: Rafael Tolosana Calasanz
 * ASIGNATURA: 30221 Sistemas Distribuidos del Grado en Ingeniería Informática
 *			Escuela de Ingeniería y Arquitectura - Universidad de Zaragoza
-* NIA: 715657
-* FECHA: octubre de 2021
-* FICHERO: server-draft.go
-* DESCRIPCIÓN: contiene la funcionalidad esencial para implementar el worker para la arquitectura master-worker
-*				
+* FECHA: septiembre de 2021
+* FICHERO: server.go
+* DESCRIPCIÓN: contiene la funcionalidad esencial para realizar los servidores
+*				correspondientes a la práctica 1
 */
 package main
 
@@ -120,28 +119,60 @@ func onWorkers(id int){
 	}
 }
 
+func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string){
+	s := strings.Split(vectDirPort[pos],":")
+	ip = s[0] //La ip
+	puerto = s[1] //El puerto
+	return ip, puerto
+}
+
+func lecturaFichero(nameFile string) (vectDirPort [] string){
+	file, err := os.Open(nameFile)
+	
+	if err != nil {
+		log.Fatalf("Error when opening file: %s", err)
+	}
+	
+	fileScanner := bufio.NewScanner(file)
+	
+	//vectDirPort = [] string{}
+	
+	for fileScanner.Scan(){
+		//fmt.Println(fileScanner.Text())
+		vectDirPort = append(vectDirPort,fileScanner.Text())
+	}
+	
+	if err := fileScanner.Err(); err != nil {
+		log.Fatalf("Error while reading file: %s", err)
+	}
+	
+	file.Close()
+	return vectDirPort
+}
+
 func main() {
-	vectDirPort := lecturaFichero("./ipServer.txt")
+	vectDirPort := lecturaFichero("./ipWorker.txt")
 	fmt.Println(vectDirPort)
 	ip, puerto := obtenerIPPuerto(vectDirPort,0)
 	fmt.Println("La IP es ", ip)
 	fmt.Println("El puerto es ", puerto)
-	fmt.Println("En espera por el puerto ", puerto)
 	
-	nWorkers := 3
+	
+	nWorkers := 6
 	
 	for i:= 0; i < nWorkers; i++ {
 		fmt.Println("Creando el worker ", i)
 		go onWorkers(i)
 	}
 	
+	fmt.Println("En espera por el puerto ", puerto)
 	listener, err := net.Listen("tcp", ":"+puerto)
 	checkError(err)
 	fin := false
 	for !fin {
 		conn, err := listener.Accept()
 		checkError(err)
-		defer conn.Close()
+		//defer conn.Close()
 		jobs <- conn
 	}
 	fmt.Println("Servidor finalizado ")
