@@ -161,7 +161,7 @@ func main() {
 	fmt.Println("El puerto es ", puerto)
 	fmt.Println("En espera por el puerto ", puerto)
 	
-	nWorkers := 3
+	nWorkers := 6
 	
 	/*reqChan := make(chan Job)
 	repChan := make(chan Result)*/
