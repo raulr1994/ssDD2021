@@ -1,11 +1,12 @@
 /*
-* AUTOR: Rafael Tolosana Calasanz
+* AUTOR: Raúl Rustarazo Carmona
 * ASIGNATURA: 30221 Sistemas Distribuidos del Grado en Ingeniería Informática
 *			Escuela de Ingeniería y Arquitectura - Universidad de Zaragoza
-* FECHA: septiembre de 2021
-* FICHERO: server.go
-* DESCRIPCIÓN: contiene la funcionalidad esencial para realizar los servidores
-*				correspondientes a la práctica 1
+* NIA: 715657
+* FECHA: octubre de 2021
+* FICHERO: worker.go
+* DESCRIPCIÓN: contiene la funcionalidad esencial para implementar el worker
+*				
 */
 package main
 
@@ -72,26 +73,25 @@ func logerr(err error) bool {
 func read(conn net.Conn) (idProcess int, interval com.TPInterval){
 	decoder := gob.NewDecoder(conn)
 	var request com.Request
-	//for{
-		err := decoder.Decode(&request)
-		checkError(err)
-		idProcess = (request.Id)		
-		interval = (request.Interval)
+	
+	err := decoder.Decode(&request)
+	checkError(err)
+	idProcess = (request.Id)		
+	interval = (request.Interval)
 		
-		fmt.Println(interval)
-	//}
+	fmt.Println(interval)
+		
 	return idProcess, interval
 }
 
 func resp(conn net.Conn, listPrimes []int, id int){
 	MessageR := com.Reply{Id: id,Primes: listPrimes}
-	fmt.Println("Mensaje de vuelta: ", MessageR)
+	//fmt.Println("Mensaje de vuelta: ", MessageR)
+	fmt.Println("Enviando al cliente el resultado")
 	encoder := gob.NewEncoder(conn)
-	//for{
-		err := encoder.Encode(MessageR)
-		checkError(err)
-	//}
-	//conn.Close()
+
+	err := encoder.Encode(MessageR)
+	checkError(err)
 }
 
 func handle(conn net.Conn){
@@ -103,20 +103,10 @@ func handle(conn net.Conn){
 	fmt.Println("Cliente conectado desde " + remoteAddr)
 	id,interval := read(conn)
 	newPrimes := FindPrimes(interval)
-	fmt.Println("Los primos encontrados son")
-	fmt.Println(newPrimes)
+	fmt.Println(len(newPrimes), " primos encontrados")
+	//fmt.Println(newPrimes)
 	resp(conn,newPrimes,id)
-}
-
-var jobs = make(chan net.Conn)
-
-func onWorkers(id int){
-	idWorker := id
-	
-	for job := range jobs {
-		fmt.Println("Trabajando con el worker ", idWorker)
-		handle(job)
-	}
+	conn.Close()
 }
 
 func obtenerIPPuerto(vectDirPort [] string, pos int) (ip string, puerto string){
@@ -156,24 +146,17 @@ func main() {
 	ip, puerto := obtenerIPPuerto(vectDirPort,0)
 	fmt.Println("La IP es ", ip)
 	fmt.Println("El puerto es ", puerto)
-	
-	
-	nWorkers := 6
-	
-	for i:= 0; i < nWorkers; i++ {
-		fmt.Println("Creando el worker ", i)
-		go onWorkers(i)
-	}
-	
 	fmt.Println("En espera por el puerto ", puerto)
 	listener, err := net.Listen("tcp", ":"+puerto)
 	checkError(err)
+	
 	fin := false
 	for !fin {
 		conn, err := listener.Accept()
 		checkError(err)
-		//defer conn.Close()
-		jobs <- conn
+		defer conn.Close()
+		handle(conn)
+		fmt.Println("Cliente respondido")
 	}
 	fmt.Println("Servidor finalizado ")
 }
