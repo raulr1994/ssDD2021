@@ -24,6 +24,7 @@ import (
 	//"strconv"
 	//"bytes"
 	"time"
+	"example.ssh/ssh"
 )
 
 func checkError(err error) {
@@ -96,7 +97,8 @@ func read(conn net.Conn) (idProcess int, interval com.TPInterval){
 
 func resp(conn net.Conn, listPrimes []int, id int){
 	MessageR := com.Reply{Id: id,Primes: listPrimes}
-	fmt.Println("Mensaje de vuelta al cliente: ", MessageR)
+	//fmt.Println("Mensaje de vuelta al cliente: ", MessageR)
+	fmt.Println("Enviando al cliente el resultado")
 	encoder := gob.NewEncoder(conn)
 	//for{
 		err := encoder.Encode(MessageR)
@@ -121,7 +123,7 @@ func receiveFromWorker(conn net.Conn) (primes [] int){
 		checkError(err)		
 		primes = (reply.Primes)
 		
-		fmt.Println(primes)
+		//fmt.Println(primes)
 	//}
 	return primes
 }
@@ -141,8 +143,8 @@ func handle(conn net.Conn, dirWorker string, connW net.Conn){
     	//Recibiendo datos del worker
 	fmt.Println("Recibiendo datos del worker con dir ", dirWorker)
 	newPrimes := receiveFromWorker(connW)
-	fmt.Println("Los primos encontrados son")
-	fmt.Println(newPrimes)
+	fmt.Println(len(newPrimes), " primos encontrados")
+	//fmt.Println(newPrimes)
 	
 	//Respondiendo al cliente
 	resp(conn,newPrimes,id)
@@ -171,6 +173,25 @@ func onWorkers(id int, newDirWorker string){
 	}
 }
 
+func executeComand (nombreusuario string, ipjhost string, comand string) {
+	ssh, err := sshcode.NewSshClient(
+		nombreusuario,
+		ipjhost,
+		22,
+		"./rsa",
+		"")
+
+	if err != nil {
+			log.Printf("SSH init error %v", err)
+	} else {
+		output, err := ssh.RunCommand(comand)
+		fmt.Println(output)
+		if err != nil {
+			log.Printf("SSH run command error %v", err)
+		}
+	}
+}
+
 func main() {
 	vectDirPort, _ := lecturaFichero("./ipServer.txt")
 	fmt.Println(vectDirPort)
@@ -182,6 +203,14 @@ func main() {
 	fmt.Println(vectDirWorkers)
 	fmt.Println(nWorkers, "nWorkers creados")
 	//ip, puerto := obtenerIPPuerto(vectDirPort,0)
+	
+	for i:= 0; i < nWorkers; i++ { //Despertando los worker
+		nombreusuario := "raulrcuni"
+		fmt.Println("Despertando el worker ", i)
+		ip,_ := obtenerIPPuerto(vectDirWorkers,i)
+		executeComand(nombreusuario,ip,"chmod 777 ./worker")
+		go executeComand(nombreusuario,ip,"./worker")
+	}
 	
 	for i:= 0; i < nWorkers; i++ {
 		fmt.Println("Creando el worker ", i)
