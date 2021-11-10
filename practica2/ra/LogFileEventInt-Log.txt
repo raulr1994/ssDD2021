@@ -1,0 +1,6 @@
+client {"client":1}
+Initialization Complete
+client {"client":2}
+INFO Trying to SC
+client {"client":3}
+INFO Esperando peticion 
