@@ -15,7 +15,6 @@ import (
 	"net"
 	"os"
 	
-	//"unsafe"
 	"reflect"
 	"github.com/DistributedClocks/GoVector/govec"
 )
@@ -63,7 +62,7 @@ func parsePeers(path string) (lines []string) {
 
 // Pre: pid en {1..n}, el conjunto de procesos del SD
 // Post: envía el mensaje msg a pid
-func (ms *MessageSystem) Send(pid int, msg Message) {
+func (ms *MessageSystem) Send(pid int, msg Message1) {
 	Logger := govec.InitGoVector("client", "clientlogfile", govec.GetDefaultConfig())
 
 	conn, err := net.Dial("tcp", ms.peers[pid - 1])
@@ -73,7 +72,11 @@ func (ms *MessageSystem) Send(pid int, msg Message) {
 	/*encoder := gob.NewEncoder(conn)
 	err = encoder.Encode(&msg)*/
 	
-	outBuf := Logger.PrepareSend("Sending packet",msg ,govec.GetDefaultLogOptions())
+	
+	fmt.Println("Enviando un 1: ", reflect.TypeOf(msg))
+	fmt.Println("Con el id ", msg.Sender)
+	outBuf := Logger.PrepareSend("Sending packet", msg, govec.GetDefaultLogOptions())
+	fmt.Println("Enviando un 2: ", reflect.TypeOf(outBuf))
 	_, err = conn.Write(outBuf)
 	if err != nil {
 		fmt.Println("GOt a conn write failure, retrying...")
@@ -107,7 +110,7 @@ func New(whoIam int, usersFile string, messageTypes []Message) (ms MessageSystem
 	ms.done = make(chan bool)
 	register(messageTypes)
 	
-	
+	Logger := govec.InitGoVector("client", "clientlogfileR", govec.GetDefaultConfig())
 	
 	go func() {
 		listener, err := net.Listen("tcp", ms.peers[ms.me-1])
@@ -121,32 +124,20 @@ func New(whoIam int, usersFile string, messageTypes []Message) (ms MessageSystem
 			default:
 				conn, err := listener.Accept()
 				checkError(err)
-				Logger := govec.InitGoVector("client", "clientlogfileR", govec.GetDefaultConfig())
+				
 				/*decoder := gob.NewDecoder(conn)
 				var msg Message
 				err = decoder.Decode(&msg)*/
 				
-				//inBuf := []byte("")
-				//var inBuf[512]byte
-				var msg1 Message1
-				//fmt.Println("Tamaño de un mensaje ", unsafe.Sizeof(msg))
-				inBuf := make([]byte,2048)
-				n, errRead := conn.Read(inBuf[0:])
-				fmt.Println("Recibido un1 ", reflect.TypeOf(inBuf))
+				inBuf := make([]byte, 2048)
+				n, errRead := conn.Read(inBuf)
 				if errRead != nil {
 					fmt.Println("Got a conn read failure, retrying...")
 					//conn.Close()
 				}
-				
-				Logger.UnpackReceive("Received Message from server", inBuf[0:n], &msg1, govec.GetDefaultLogOptions())
-				fmt.Println("Recibido un1 ", reflect.TypeOf(msg1))
-				fmt.Println("Con el id ", msg1.Sender)
-				fmt.Println("Con la operacion ", msg1.Operation)
-				fmt.Println("Con el reloj ", msg1.Clock)
-				fmt.Println("Con el escribir ", msg1.Write)
 				var msg Message
-
-				//fmt.Println("Recibido un3 ", reflect.TypeOf(trans))			
+				Logger.UnpackReceive("Received Message from server", inBuf[0:n], &msg, govec.GetDefaultLogOptions())
+								
 				conn.Close()
 				ms.mbox <- msg
 			}

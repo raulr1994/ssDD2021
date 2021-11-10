@@ -10,8 +10,6 @@ package ms
 
 import (
 	"testing"
-	"reflect"
-	"fmt"
 )
 
 type Request struct {
@@ -24,22 +22,12 @@ type Reply struct{
 	Response string
 }
 
-
 func TestSendReceiveMessage(t *testing.T) {
-		p1 := New(1, "./users2.txt", []Message{Request{}, Reply{}})
+	p1 := New(1, "./users2.txt", []Message{Request{},Reply{}})
 	
-		//p1.Send(2, Request{1})
-		for {
-			msg := p1.Receive()
-			fmt.Println("Recibido un ", reflect.TypeOf(msg))
-			if(reflect.TypeOf(msg).String() == "ms.Request"){
-				fmt.Println("Id del mensaje Request :", msg.(Request).Type)
-				fmt.Println("Id del mensaje Request :", msg.(Request).Id)
-			}else{
-				fmt.Println("Id del mensaje Request :", msg.(Reply).Type)
-				fmt.Println("Nombre del mensaje Reply :", msg.(Reply).Response)
-			}
-		}
-}	
+	p1.Send(2, Request{TYPEREQUEST,99})
+	p1.Send(2, Reply{TYPEREPLY,"HOla"})
+	//p1.Send(2, Message1{Operation: "ataque", Sender: 1, Clock: 12, Write: true})
+}
 
 

@@ -14,30 +14,37 @@ import (
 	"fmt"
 	"net"
 	"os"
-	
+	"reflect"
 	"github.com/DistributedClocks/GoVector/govec"
 )
 
-type Message interface {
-
-}
-
-/*type Message struct{
-	Operation string //
-	Sender int //EL ID de quien lo envia
-	Clock int //EL reloj de quien lo envia
-	Write bool //Si el proceso quiere leer o escribir
-}*/
+type Message interface {}
 
 type MessageSystem struct {
 	mbox  chan Message
 	peers []string
 	done  chan bool
 	me    int
+	Logger	*govec.GoLog
+}
+
+type Request struct {
+	Type string
+	Id int
+	Clock int
+	Escritor bool //El mensaje es de un escritor(True) o lector (False)
+}
+
+type Reply struct{
+	Type string
+	Response string
 }
 
 const (
 	MAXMESSAGES = 10000
+	TYPEREQUEST = "REQUEST"
+	TYPEREPLY = "REPLY"
+	MSGFREE = "LIBERAR"
 )
 
 func checkError(err error) {
@@ -62,16 +69,14 @@ func parsePeers(path string) (lines []string) {
 // Pre: pid en {1..n}, el conjunto de procesos del SD
 // Post: envía el mensaje msg a pid
 func (ms *MessageSystem) Send(pid int, msg Message) {
-	Logger := govec.InitGoVector("client", "clientlogfile", govec.GetDefaultConfig())
 
 	conn, err := net.Dial("tcp", ms.peers[pid - 1])
 	checkError(err)
-	//opts := govec.GetDefaultLogOptions()
 	
-	/*encoder := gob.NewEncoder(conn)
-	err = encoder.Encode(&msg)*/
-	
-	outBuf := Logger.PrepareSend("Sending packet",msg ,govec.GetDefaultLogOptions())
+	fmt.Println("Enviando un 1: ", reflect.TypeOf(msg))
+	//fmt.Println("Enviando un 2 con ID: ", msg.(Request).Id)
+	outBuf := ms.Logger.PrepareSend("Sending packet", msg, govec.GetDefaultLogOptions())
+	fmt.Println("Enviando un 2: ", reflect.TypeOf(outBuf))
 	_, err = conn.Write(outBuf)
 	if err != nil {
 		fmt.Println("GOt a conn write failure, retrying...")
@@ -104,13 +109,12 @@ func New(whoIam int, usersFile string, messageTypes []Message) (ms MessageSystem
 	ms.mbox = make(chan Message, MAXMESSAGES)
 	ms.done = make(chan bool)
 	register(messageTypes)
-	
-	Logger := govec.InitGoVector("client", "clientlogfileR", govec.GetDefaultConfig())
-	
+	ms.Logger = govec.InitGoVector("client", "clientlogfile2", govec.GetDefaultConfig())
 	go func() {
 		listener, err := net.Listen("tcp", ms.peers[ms.me-1])
 		checkError(err)
 		fmt.Println("Process listening at " + ms.peers[ms.me-1])
+		
 		defer close(ms.mbox)
 		for {
 			select {
@@ -119,22 +123,33 @@ func New(whoIam int, usersFile string, messageTypes []Message) (ms MessageSystem
 			default:
 				conn, err := listener.Accept()
 				checkError(err)
-				
-				/*decoder := gob.NewDecoder(conn)
 				var msg Message
-				err = decoder.Decode(&msg)*/
 				
-				inBuf := make([]byte, 2048)
-				n, errRead := conn.Read(inBuf)
+				inBuf := make([]byte,2048)
+				_, errRead := conn.Read(inBuf)
 				if errRead != nil {
 					fmt.Println("Got a conn read failure, retrying...")
 					//conn.Close()
 				}
-				var msg Message
-				Logger.UnpackReceive("Received Message from server", inBuf[0:n], &msg, govec.GetDefaultLogOptions())
-								
+				
+				ms.Logger.UnpackReceive("Received Message from server", inBuf, &msg, govec.GetDefaultLogOptions())
+				fmt.Println("Detecting message ", reflect.ValueOf(msg))
+				switch v := msg.(type) {
+					case map[string]interface {}:
+						fmt.Println("map[string]interface {} ", v)
+						if(v["Type"] == "REQUEST"){
+							fmt.Println("Detecting Request ", v)
+							msgR := Request{v["Type"].(string),int(v["Id"].(int8)),int(v["Clock"].(int8)),v["Escritor"].(bool)}
+							ms.mbox <- msgR
+						} else if (v["Type"] == "REPLY"){
+							fmt.Println("Detecting Reply ", v)
+							msgR := Reply{v["Type"].(string), v["Response"].(string)}
+							ms.mbox <- msgR
+						}
+					case nil:
+						fmt.Println("Detecting nil")
+				}
 				conn.Close()
-				ms.mbox <- msg
 			}
 		}
 	}()

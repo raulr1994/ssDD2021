@@ -1,6 +1,2 @@
 client {"client":1}
 Initialization Complete
-client {"client":2}
-INFO Received Message from server
-client {"client":3}
-INFO Received Message from server

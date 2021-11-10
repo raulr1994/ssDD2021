@@ -15,7 +15,8 @@ import (
 	"net"
 	"os"
 	
-	"github.com/DistributedClocks/GoVector/govec"
+	"reflect"
+	//"github.com/DistributedClocks/GoVector/govec"
 )
 
 type Message interface {
@@ -62,22 +63,12 @@ func parsePeers(path string) (lines []string) {
 // Pre: pid en {1..n}, el conjunto de procesos del SD
 // Post: envía el mensaje msg a pid
 func (ms *MessageSystem) Send(pid int, msg Message) {
-	Logger := govec.InitGoVector("client", "clientlogfile", govec.GetDefaultConfig())
 
 	conn, err := net.Dial("tcp", ms.peers[pid - 1])
 	checkError(err)
-	//opts := govec.GetDefaultLogOptions()
-	
-	/*encoder := gob.NewEncoder(conn)
-	err = encoder.Encode(&msg)*/
-	
-	outBuf := Logger.PrepareSend("Sending packet",msg ,govec.GetDefaultLogOptions())
-	_, err = conn.Write(outBuf)
-	if err != nil {
-		fmt.Println("GOt a conn write failure, retrying...")
-		//conn.Close()
-	}
-	
+	encoder := gob.NewEncoder(conn)
+	fmt.Println("Enviando un1 : ", reflect.TypeOf(msg))
+	err = encoder.Encode(&msg)
 	conn.Close()
 }
 
@@ -105,8 +96,6 @@ func New(whoIam int, usersFile string, messageTypes []Message) (ms MessageSystem
 	ms.done = make(chan bool)
 	register(messageTypes)
 	
-	Logger := govec.InitGoVector("client", "clientlogfileR", govec.GetDefaultConfig())
-	
 	go func() {
 		listener, err := net.Listen("tcp", ms.peers[ms.me-1])
 		checkError(err)
@@ -120,19 +109,13 @@ func New(whoIam int, usersFile string, messageTypes []Message) (ms MessageSystem
 				conn, err := listener.Accept()
 				checkError(err)
 				
-				/*decoder := gob.NewDecoder(conn)
+				decoder := gob.NewDecoder(conn)
 				var msg Message
-				err = decoder.Decode(&msg)*/
-				
-				inBuf := make([]byte, 2048)
-				n, errRead := conn.Read(inBuf)
-				if errRead != nil {
-					fmt.Println("Got a conn read failure, retrying...")
-					//conn.Close()
-				}
-				var msg Message
-				Logger.UnpackReceive("Received Message from server", inBuf[0:n], &msg, govec.GetDefaultLogOptions())
-								
+				err = decoder.Decode(&msg)
+				fmt.Println("Recibiendo un1 : ", reflect.TypeOf(msg))
+				if(reflect.TypeOf(msg).String() == "ms.Request"){
+					fmt.Println("Id del mensaje Request : ", msg.(Request).Id)
+				}				
 				conn.Close()
 				ms.mbox <- msg
 			}
