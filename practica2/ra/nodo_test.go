@@ -73,14 +73,18 @@ func (ra *RASharedDB) listening(){
 					
 				ra.Mutex.Unlock()
 				
-			}else{ //RECIBIDO REPLY
-				fmt.Println("Id del mensaje Reply :", msg.(ms.Reply).Type)
+			} else if reflect.TypeOf(msg).String() == "ms.Reply" { //RECIBIDO REPLY
+				fmt.Println("Tipo del mensaje Reply :", msg.(ms.Reply).Type)
 				fmt.Println("Nombre del mensaje Reply :", msg.(ms.Reply).Response)
 				ra.Mutex.Lock()
 					fmt.Println("Contador de espera 1: ", ra.OutRepCnt)
 					ra.OutRepCnt = ra.OutRepCnt - 1
 					fmt.Println("Contador de espera 2: ", ra.OutRepCnt)
 				ra.Mutex.Unlock()
+			} else { //Recibido orden de escritura
+				fmt.Println("Tipo del mensaje Write :", msg.(ms.Reply).Type)
+				fmt.Println("Linea del mensaje Write :", msg.(ms.Reply).Response)
+				//Escribir en el archivo (slice de escrituras)
 			}
 		}
 }
