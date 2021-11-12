@@ -109,13 +109,13 @@ func register(messageTypes []Message){
 // Pre: whoIam es el pid del proceso que inicializa este ms
 //		usersFile es la ruta a un fichero de texto que en cada línea contiene IP:puerto de cada participante
 //		messageTypes es un slice con todos los tipos de mensajes que los procesos se pueden intercambiar a través de este ms
-func New(whoIam int, usersFile string, messageTypes []Message) (ms MessageSystem) {
+func New(whoIam int, usersFile string, messageTypes []Message, Logger *govec.GoLog) (ms MessageSystem) {
 	ms.me = whoIam
 	ms.peers = parsePeers(usersFile)
 	ms.mbox = make(chan Message, MAXMESSAGES)
 	ms.done = make(chan bool)
 	register(messageTypes)
-	ms.Logger = govec.InitGoVector("client", "clientlogfile2", govec.GetDefaultConfig())
+	ms.Logger = Logger
 	go func() {
 		listener, err := net.Listen("tcp", ms.peers[ms.me-1])
 		checkError(err)
@@ -138,7 +138,7 @@ func New(whoIam int, usersFile string, messageTypes []Message) (ms MessageSystem
 					//conn.Close()
 				}
 				
-				ms.Logger.UnpackReceive("Received Message from server", inBuf, &msg, govec.GetDefaultLogOptions())
+				ms.Logger.UnpackReceive("Received Message from nodo", inBuf, &msg, govec.GetDefaultLogOptions())
 				fmt.Println("Detecting message ", reflect.ValueOf(msg))
 				switch v := msg.(type) {
 					case map[string]interface {}:
