@@ -4,3 +4,17 @@ client {"client":2}
 INFO Trying to SC
 client {"client":3}
 INFO Esperando peticion 
+client {"client":4}
+INFO Recibido un ms.Request
+client {"client":5}
+INFO Esperando peticion 
+client {"client":6}
+INFO Recibido un ms.Reply
+client {"client":7}
+INFO Esperando peticion 
+client {"client":8}
+INFO Entering to SC
+client {"client":9}
+INFO Reading by 1
+client {"client":10}
+INFO Exiting from SC

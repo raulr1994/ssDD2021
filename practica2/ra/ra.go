@@ -13,6 +13,8 @@ import (
     "sync"
     "github.com/DistributedClocks/GoVector/govec"
     //"time"
+    "fmt"
+    "strconv"
 )
 
 /*type Message interface {}
@@ -33,6 +35,7 @@ const (
 	TYPEREQUEST = "REQUEST"
 	TYPEREPLY = "REPLY"
 	MSGFREE = "LIBERAR"
+	TYPEWRITE = "WRITE"
 )
 
 type RASharedDB struct {
@@ -58,6 +61,11 @@ func New(me int, usersFile string, nnodes int, escritor bool) (*RASharedDB) {
     Logger := govec.InitGoVector("client", "LogFileEventInt", govec.GetDefaultConfig())
     msgs := ms.New(me, usersFile, messageTypes)
     ra := RASharedDB{0, 0, 0, false, []bool{}, &msgs,  make(chan bool),  make(chan bool), sync.Mutex{}, me, nnodes, escritor, Logger}
+    
+    for i:=0; i<nnodes; i++ {
+    	ra.RepDefd = append(ra.RepDefd,false)
+    }
+    fmt.Println("Vector de booleanos ", ra.RepDefd)
     // TODO completar
     return &ra
 }
@@ -72,19 +80,25 @@ func (ra *RASharedDB) PreProtocol(){
     	ra.OurSeqNum = ra.HigSeqNum + 1 //Actualizar el reloj interno
     	ra.OutRepCnt = ra.NNodes-1 //Nodos a los que se esta esperando respuesta
     	
-    	for j:= 0; j < ra.NNodes; j++ {
+    	for j:= 1; j < (ra.NNodes+1); j++ {
+    		
     		if(j != ra.me){ //Enviar una peticion para acceder a la SC a todos los nodos salvo a si mismo
-    			ra.ms.Send(j+1, ms.Request{TYPEREQUEST,ra.me,ra.OurSeqNum,ra.Escritor})//Operacion/IdNodo/ClockNodo/Escritor/Lector
+    			fmt.Println("Enviando a: ", j)
+    			ra.ms.Send(j, ms.Request{TYPEREQUEST,ra.me,ra.OurSeqNum,ra.Escritor})//Operacion/IdNodo/ClockNodo/Escritor/Lector
     		}
     	}
-    	
+    	ra.Mutex.Unlock()
+    	fmt.Println("Waitting for  " + strconv.Itoa(ra.OutRepCnt) + " replies")
     	for {
     		ra.Mutex.Lock()//Asegurar la exlusión mutua cuabndo se consulta la variable
+    		//fmt.Println("Waitting for  " + strconv.Itoa(ra.OutRepCnt) + " replies")
     		if ra.OutRepCnt == 0 {//Esperar a que haya recibido todas las respuestas
+    			fmt.Println("Exiting from Waitting for  " + strconv.Itoa(ra.OutRepCnt) + " replies")
     			break
     		}
     		ra.Mutex.Unlock()    		
     	}
+    	ra.Mutex.Unlock()
 }
 //Pre: Verdad
 //Post: Realiza  el  PostProtocol  para el  algoritmo de
@@ -93,14 +107,15 @@ func (ra *RASharedDB) PostProtocol(){
 	// TODO completa
     	ra.Mutex.Lock()
     	ra.ReqCS = false
-    	
+    	fmt.Println("Liberando a los que quedan")
     	for d := 0; d<ra.NNodes ;d++ { //Liberar a todos los que estaban a la espera de permiso(True)
     		if(ra.RepDefd[d]){ //Si estaba a la espera, hay que liberarlo
+    			fmt.Println("Liberando a", d)
     			ra.RepDefd[d] = false;
     			ra.ms.Send(d,ms.Reply{TYPEREPLY,MSGFREE})
     		}
     	}
-    	ra.Mutex.Lock()
+    	ra.Mutex.Unlock()
 }
 
 func (ra *RASharedDB) Stop(){
