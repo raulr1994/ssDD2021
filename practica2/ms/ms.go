@@ -30,6 +30,7 @@ type MessageSystem struct {
 
 type Request struct {
 	Type string
+	//byte array
 	Id int
 	Clock int
 	Escritor bool //El mensaje es de un escritor(True) o lector (False)
@@ -63,6 +64,7 @@ func parsePeers(path string) (lines []string) {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
+	fmt.Println("Las lineas quedan asi " , lines)
 	return lines
 }
 
@@ -70,13 +72,17 @@ func parsePeers(path string) (lines []string) {
 // Post: envía el mensaje msg a pid
 func (ms *MessageSystem) Send(pid int, msg Message) {
 
-	conn, err := net.Dial("tcp", ms.peers[pid - 1])
-	checkError(err)
+	fmt.Println("Posicion accedida " , pid-1)
+	fmt.Println("Process conecting at " + ms.peers[pid-1])
+	conn, err := net.Dial("tcp", ms.peers[pid-1])
+	//intentos := 0
+	for /*intentos < 10 &&*/ err!=nil {
+		conn, err = net.Dial("tcp", ms.peers[pid-1])
+		//intentos = intentos+1
+	}
 	
-	fmt.Println("Enviando un 1: ", reflect.TypeOf(msg))
-	//fmt.Println("Enviando un 2 con ID: ", msg.(Request).Id)
+
 	outBuf := ms.Logger.PrepareSend("Sending packet", msg, govec.GetDefaultLogOptions())
-	fmt.Println("Enviando un 2: ", reflect.TypeOf(outBuf))
 	_, err = conn.Write(outBuf)
 	if err != nil {
 		fmt.Println("GOt a conn write failure, retrying...")
@@ -136,13 +142,13 @@ func New(whoIam int, usersFile string, messageTypes []Message) (ms MessageSystem
 				fmt.Println("Detecting message ", reflect.ValueOf(msg))
 				switch v := msg.(type) {
 					case map[string]interface {}:
-						fmt.Println("map[string]interface {} ", v)
+						//fmt.Println("map[string]interface {} ", v)
 						if(v["Type"] == "REQUEST"){
-							fmt.Println("Detecting Request ", v)
+							//fmt.Println("Detecting Request ", v)
 							msgR := Request{v["Type"].(string),int(v["Id"].(int8)),int(v["Clock"].(int8)),v["Escritor"].(bool)}
 							ms.mbox <- msgR
 						} else if (v["Type"] == "REPLY"){
-							fmt.Println("Detecting Reply ", v)
+							//fmt.Println("Detecting Reply ", v)
 							msgR := Reply{v["Type"].(string), v["Response"].(string)}
 							ms.mbox <- msgR
 						}
