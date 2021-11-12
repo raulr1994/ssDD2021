@@ -58,8 +58,8 @@ type RASharedDB struct {
 
 func New(me int, usersFile string, nnodes int, escritor bool) (*RASharedDB) {
     messageTypes := []ms.Message{ms.Request{},ms.Reply{}}
-    Logger := govec.InitGoVector("client", "LogFileEventInt", govec.GetDefaultConfig())
-    msgs := ms.New(me, usersFile, messageTypes)
+    Logger := govec.InitGoVector("nodo_" + strconv.Itoa(me) , "LogFileEventInt from " + strconv.Itoa(me), govec.GetDefaultConfig())
+    msgs := ms.New(me, usersFile, messageTypes, Logger)
     ra := RASharedDB{0, 0, 0, false, []bool{}, &msgs,  make(chan bool),  make(chan bool), sync.Mutex{}, me, nnodes, escritor, Logger}
     
     for i:=0; i<nnodes; i++ {
@@ -109,10 +109,10 @@ func (ra *RASharedDB) PostProtocol(){
     	ra.ReqCS = false
     	fmt.Println("Liberando a los que quedan")
     	for d := 0; d<ra.NNodes ;d++ { //Liberar a todos los que estaban a la espera de permiso(True)
-    		if(ra.RepDefd[d]){ //Si estaba a la espera, hay que liberarlo
-    			fmt.Println("Liberando a", d)
+    		if(ra.RepDefd[d] && d != ra.me-1){ //Si estaba a la espera, hay que liberarlo
+    			fmt.Println("Liberando a", d+1)
     			ra.RepDefd[d] = false;
-    			ra.ms.Send(d,ms.Reply{TYPEREPLY,MSGFREE})
+    			ra.ms.Send(d+1,ms.Reply{TYPEREPLY,MSGFREE})
     		}
     	}
     	ra.Mutex.Unlock()

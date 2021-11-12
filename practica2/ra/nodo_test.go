@@ -65,7 +65,7 @@ func (ra *RASharedDB) listening(){
 					fmt.Println("5 ", exlusion(msg.(ms.Request).Escritor,ra.Escritor))
 					if Defer_it { //Tengo más prioridad asi que pongo al nodo de la petición a esperar
 						fmt.Println("Soy superior de ", msg.(ms.Request).Id)
-						ra.RepDefd[msg.(ms.Request).Id] = true
+						ra.RepDefd[msg.(ms.Request).Id-1] = true
 					} else {//Tengo menos prioridad o no quiero acceder a la seccion critica le doy el permiso al nodo
 						fmt.Println("Aceptando superioridad de ", msg.(ms.Request).Id)
 						ra.ms.Send(msg.(ms.Request).Id,ms.Reply{TYPEREPLY,MSGFREE})
@@ -74,17 +74,19 @@ func (ra *RASharedDB) listening(){
 				ra.Mutex.Unlock()
 				
 			} else if reflect.TypeOf(msg).String() == "ms.Reply" { //RECIBIDO REPLY
-				fmt.Println("Tipo del mensaje Reply :", msg.(ms.Reply).Type)
-				fmt.Println("Nombre del mensaje Reply :", msg.(ms.Reply).Response)
-				ra.Mutex.Lock()
-					fmt.Println("Contador de espera 1: ", ra.OutRepCnt)
-					ra.OutRepCnt = ra.OutRepCnt - 1
-					fmt.Println("Contador de espera 2: ", ra.OutRepCnt)
-				ra.Mutex.Unlock()
-			} else { //Recibido orden de escritura
-				fmt.Println("Tipo del mensaje Write :", msg.(ms.Reply).Type)
-				fmt.Println("Linea del mensaje Write :", msg.(ms.Reply).Response)
-				//Escribir en el archivo (slice de escrituras)
+				if msg.(ms.Reply).Type == TYPEREPLY {
+					fmt.Println("Tipo del mensaje Reply :", msg.(ms.Reply).Type)
+					fmt.Println("Nombre del mensaje Reply :", msg.(ms.Reply).Response)
+					ra.Mutex.Lock()
+						fmt.Println("Contador de espera 1: ", ra.OutRepCnt)
+						ra.OutRepCnt = ra.OutRepCnt - 1
+						fmt.Println("Contador de espera 2: ", ra.OutRepCnt)
+					ra.Mutex.Unlock()
+				} else { //Recibido orden de escritura
+					fmt.Println("Tipo del mensaje Write :", msg.(ms.Reply).Type)
+					fmt.Println("Linea del mensaje Write :", msg.(ms.Reply).Response)
+					//Escribir en el archivo (slice de escrituras)
+				}
 			}
 		}
 }
@@ -103,7 +105,7 @@ func TestReader(t *testing.T){
     	//pId := flag.Int("ID",0,"El id del nodo RA")
     	//2º inicializar variables
     	nExp := 1
-    	opP := false //Leer(False),Escibir(True)
+    	opP := true //Leer(False),Escibir(True)
     	nNodes := 2
     	rai := New(1,"./users.txt",nNodes,opP);//Pid, nombre fichero, numero de nodos y si es escritor o lector
     	//bufferDeLectura := "" //Donde guardar lo que se lee
@@ -119,9 +121,9 @@ func TestReader(t *testing.T){
 		if opP {
 			fmt.Println("Escribiendo")
 			rai.Logger.LogLocalEvent("Writting by " + strconv.Itoa(rai.me), govec.GetDefaultLogOptions())
-			gestorfichero.EscribirFichero("memory.txt", strconv.Itoa(i)) + "Escrito por el escritor " + strconv.Itoa(rai.me))
+			gestorfichero.EscribirFichero("memory.txt", strconv.Itoa(i) + "Escrito por el escritor " + strconv.Itoa(rai.me))
 				//Mandar a todos los nodos que he escrito para que lo escriban ellos también
-			ra.SendWriteAll(strconv.Itoa(i) + "Escrito por el escritor " + strconv.Itoa(rai.me))
+			rai.SendWriteAll(strconv.Itoa(i) + "Escrito por el escritor " + strconv.Itoa(rai.me))
 		} else {
 			fmt.Println("Leyendo")
 			rai.Logger.LogLocalEvent("Reading by " + strconv.Itoa(rai.me), govec.GetDefaultLogOptions())
