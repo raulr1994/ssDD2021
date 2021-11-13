@@ -14,7 +14,7 @@ Lector_2 {"Lector_2":7}
 INFO Sending packet
 Lector_2 {"Lector_2":8}
 INFO Waitting for  1 replies
-Lector_2 {"Lector_2":9, "Escritor_1":7}
+Lector_2 {"Escritor_1":7, "Lector_2":9}
 INFO Received Message from nodo
 Lector_2 {"Lector_2":10, "Escritor_1":7}
 INFO Recibido un ms.Request
@@ -24,9 +24,21 @@ Lector_2 {"Lector_2":12, "Escritor_1":7}
 INFO Sending packet
 Lector_2 {"Lector_2":13, "Escritor_1":7}
 INFO Esperando peticion 
-Lector_2 {"Escritor_1":22, "Lector_2":14}
+Lector_2 {"Lector_2":14, "Escritor_1":22}
 INFO Received Message from nodo
 Lector_2 {"Lector_2":15, "Escritor_1":22}
 INFO Recibido un ms.Reply
 Lector_2 {"Lector_2":16, "Escritor_1":22}
 INFO Esperando peticion 
+Lector_2 {"Lector_2":17, "Escritor_1":22}
+INFO Exiting from Waitting for  0 replies
+Lector_2 {"Lector_2":18, "Escritor_1":22}
+INFO Entering to SC
+Lector_2 {"Escritor_1":22, "Lector_2":19}
+INFO Reading by 2
+Lector_2 {"Lector_2":20, "Escritor_1":22}
+INFO Exiting from SC
+Lector_2 {"Lector_2":21, "Escritor_1":22}
+INFO Liberando a los que quedan
+Lector_2 {"Lector_2":22, "Escritor_1":22}
+INFO Finishing 2
