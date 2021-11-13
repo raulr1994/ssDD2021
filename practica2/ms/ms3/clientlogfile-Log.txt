@@ -1,4 +1,0 @@
-client {"client":1}
-Initialization Complete
-client {"client":2}
-INFO Sending packet
