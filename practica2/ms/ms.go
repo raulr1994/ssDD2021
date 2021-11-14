@@ -46,6 +46,7 @@ type Reply struct{
 
 type CapsuleMessage struct {
 	Msg Message
+	Buffer []uint8
 }
 
 const (
@@ -131,28 +132,30 @@ func New(whoIam int, usersFile string, messageTypes []Message, Logger *govec.GoL
 			default:
 				conn, err := listener.Accept()
 				checkError(err)
-				var msg Message
 				
+				decoder := gob.NewDecoder(conn)
+				
+				var msg Message
+				var msgE CapsuleMessage
+				
+				err = decoder.Decode(&msgE)
 				inBuf := make([]byte,2048)
-				_, errRead := conn.Read(inBuf)
-				if errRead != nil {
+				//_, errRead := conn.Read(inBuf)
+				if err != nil {
 					fmt.Println("Got a conn read failure, retrying...")
 					//conn.Close()
 				}
 				
-				switch v := msg.(type) {
-					case map[string]interface {}:
-						if(v["Type"] == "REQUEST"){
-							ms.Logger.UnpackReceive("Received REQUEST from nodo " + strconv.Itoa(int(v["Id"].(int8))), inBuf, &msg, govec.GetDefaultLogOptions())
-							msgR := Request{v["Type"].(string),int(v["Id"].(int8)),int(v["Clock"].(int8)),v["Escritor"].(bool)}
-							ms.mbox <- msgR
-						} else if (v["Type"] == "REPLY"){
-							ms.Logger.UnpackReceive("Received REPLY", inBuf, &msg, govec.GetDefaultLogOptions())
-							msgR := Reply{v["Type"].(string), v["Response"].(string), v["Mode"].(bool)}
-							ms.mbox <- msgR
-						}
-					case nil:
-						fmt.Println("Detecting nil")
+				
+				switch v := (msgE.Msg).(type) {
+					case Request:
+						ms.Logger.UnpackReceive("Received " +  reflect.TypeOf(v).String() + " from nodo " + strconv.Itoa(v.Id), inBuf, &msg, govec.GetDefaultLogOptions())
+							ms.mbox <- msgE.Msg
+					case Reply:
+						ms.Logger.UnpackReceive("Received "+  reflect.TypeOf(v).String(), inBuf, &msg, govec.GetDefaultLogOptions())
+							ms.mbox <- msgE.Msg
+					default:
+						fmt.Println("Detecting error")
 				}
 				conn.Close()
 			}
