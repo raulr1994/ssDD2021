@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"net"
 	"os"
-	//"reflect"
+	"reflect"
 	"github.com/DistributedClocks/GoVector/govec"
 	"strconv"
 )
@@ -42,6 +42,10 @@ type Reply struct{
 	Type string
 	Response string
 	Mode bool //Si true es para escribir, si false es para liberar
+}
+
+type CapsuleMessage struct {
+	Msg Message
 }
 
 const (
@@ -80,7 +84,7 @@ func (ms *MessageSystem) Send(pid int, msg Message) {
 		conn, err = net.Dial("tcp", ms.peers[pid-1])
 	}
 
-	outBuf := ms.Logger.PrepareSend("Sending " + reflect.TypeOf(msg).String() + " to node " + strconv.Itoa(rai.me), msg, govec.GetDefaultLogOptions())
+	outBuf := ms.Logger.PrepareSend("Sending " + reflect.TypeOf(msg).String() + " to node " + strconv.Itoa(pid), msg, govec.GetDefaultLogOptions())
 	_, err = conn.Write(outBuf)
 	if err != nil {
 		fmt.Println("GOt a conn write failure, retrying...")

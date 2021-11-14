@@ -11,7 +11,6 @@ package gestorfichero
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"log"
 	"io/ioutil"
@@ -66,3 +65,9 @@ func LimpiarFichero(nameFile string){
 	}
 }
 
+func LeerLectura(lectura [] string) (linea string){
+	for i := range lectura {
+		linea = append(linea,lectura [i])
+	}
+	return linea
+}

@@ -37,7 +37,7 @@ func TestReader(t *testing.T){
 		lectura := gestorfichero.LeerFichero("memory.txt")
 		rai.Mutex.Unlock()
 		
-		rai.Logger.LogLocalEvent(lectura, govec.GetDefaultLogOptions())
+		rai.Logger.LogLocalEvent(gestorFichero.LeerLectura(lectura), govec.GetDefaultLogOptions())
 		//Enviar al resto de nodos que ha escrito un escritor
 		rai.Logger.LogLocalEvent("Exiting from SC by Lector " + strconv.Itoa(rai.me), govec.GetDefaultLogOptions())
 		rai.release_mutex("",false)//Liberar el mutex

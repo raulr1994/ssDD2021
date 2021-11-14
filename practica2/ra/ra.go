@@ -95,11 +95,11 @@ func (ra *RASharedDB) PreProtocol(){
     		}
     	}
     	ra.Mutex.Unlock()
-    	ra.Logger.LogLocalEvent("Waitting by Writter" + strconv.Itoa(rai.me) + " for  " + strconv.Itoa(ra.OutRepCnt) + " replies", govec.GetDefaultLogOptions())
+    	ra.Logger.LogLocalEvent("Waitting by Writter" + strconv.Itoa(ra.me) + " for  " + strconv.Itoa(ra.OutRepCnt) + " replies", govec.GetDefaultLogOptions())
     	for {
     		ra.Mutex.Lock()//Asegurar la exlusión mutua cuabndo se consulta la variable
     		if ra.OutRepCnt == 0 {//Esperar a que haya recibido todas las respuestas
-    			ra.Logger.LogLocalEvent("Exiting from Waitting by Writter  " + strconv.Itoa(rai.me), govec.GetDefaultLogOptions())
+    			ra.Logger.LogLocalEvent("Exiting from Waitting by Writter  " + strconv.Itoa(ra.me), govec.GetDefaultLogOptions())
     			break
     		}
     		ra.Mutex.Unlock()    		
@@ -143,9 +143,9 @@ func exlusion(evento1 bool, evento2 bool) bool{
 
 func (ra *RASharedDB) acquire_mutex(tipoOp bool){ //Escibir true, leer false
 	if ra.Escritor {
-		ra.Logger.LogLocalEvent("Trying to SC by Writer "+ strconv.Itoa(rai.me), govec.GetDefaultLogOptions())
+		ra.Logger.LogLocalEvent("Trying to SC by Writer "+ strconv.Itoa(ra.me), govec.GetDefaultLogOptions())
 	} else {
-		ra.Logger.LogLocalEvent("Trying to SC by Reader "+ strconv.Itoa(rai.me), govec.GetDefaultLogOptions())
+		ra.Logger.LogLocalEvent("Trying to SC by Reader "+ strconv.Itoa(ra.me), govec.GetDefaultLogOptions())
 	}
 	ra.PreProtocol()
 }
