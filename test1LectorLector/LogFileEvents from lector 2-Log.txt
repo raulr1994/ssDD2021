@@ -1,0 +1,80 @@
+Lector_2 {"Lector_2":1}
+Initialization Complete
+Lector_2 {"Lector_2":2}
+INFO Enviando REQUEST al nodo 1
+Lector_2 {"Lector_2":3}
+INFO Process conecting at 192.168.1.1:30000
+Lector_2 {"Lector_2":4}
+INFO Esperando un mensaje 
+Lector_2 {"Lector_2":5}
+INFO Process listening at 192.168.1.2:30000
+Lector_2 {"Lector_2":6}
+INFO Sending ms.Request to node 1
+Lector_2 {"Lector_2":7}
+INFO Waitting by Writter2 for  1 replies
+Lector_2 {"Lector_1":6, "Lector_2":8}
+INFO Received Message
+Lector_2 {"Lector_2":9, "Lector_1":6}
+INFO Received REQUEST from nodo 1
+Lector_2 {"Lector_2":10, "Lector_1":6}
+INFO Acepto la superioridad del nodo 1
+Lector_2 {"Lector_2":11, "Lector_1":6}
+INFO Process conecting at 192.168.1.1:30000
+Lector_2 {"Lector_1":6, "Lector_2":12}
+INFO Sending ms.Reply to node 1
+Lector_2 {"Lector_2":13, "Lector_1":6}
+INFO Esperando un mensaje 
+Lector_2 {"Lector_1":14, "Lector_2":14}
+INFO Received Message
+Lector_2 {"Lector_2":15, "Lector_1":14}
+INFO Received REPLY from nodo 1
+Lector_2 {"Lector_2":16, "Lector_1":22}
+INFO Received Message
+Lector_2 {"Lector_2":17, "Lector_1":22}
+INFO Received REQUEST from nodo 1
+Lector_2 {"Lector_2":18, "Lector_1":22}
+INFO Esperando un mensaje 
+Lector_2 {"Lector_2":19, "Lector_1":22}
+INFO Entering to SC by Lector 2 and reading
+Lector_2 {"Lector_2":20, "Lector_1":22}
+INFO 
+Lector_2 {"Lector_1":22, "Lector_2":21}
+INFO Exiting from SC by Lector2and free the SC 2
+Lector_2 {"Lector_2":22, "Lector_1":22}
+INFO Sending signal ending by Writter2 to all
+Lector_2 {"Lector_2":23, "Lector_1":22}
+INFO Enviando finish al nodo 1
+Lector_2 {"Lector_2":24, "Lector_1":22}
+INFO Process conecting at 192.168.1.1:30000
+Lector_2 {"Lector_2":25, "Lector_1":22}
+INFO Acepto la superioridad del nodo 1
+Lector_2 {"Lector_2":26, "Lector_1":22}
+INFO Process conecting at 192.168.1.1:30000
+Lector_2 {"Lector_2":27, "Lector_1":22}
+INFO Sending ms.Reply to node 1
+Lector_2 {"Lector_2":28, "Lector_1":22}
+INFO Esperando un mensaje 
+Lector_2 {"Lector_2":29, "Lector_1":22}
+INFO Sending ms.Finish to node 1
+Lector_2 {"Lector_2":30, "Lector_1":22}
+INFO Waitting by ending Writter 2
+Lector_2 {"Lector_2":31, "Lector_1":35}
+INFO Received Message
+Lector_2 {"Lector_2":32, "Lector_1":35}
+INFO Received REQUEST from nodo 1
+Lector_2 {"Lector_2":33, "Lector_1":35}
+INFO Acepto la superioridad del nodo 1
+Lector_2 {"Lector_2":34, "Lector_1":35}
+INFO Process conecting at 192.168.1.1:30000
+Lector_2 {"Lector_2":35, "Lector_1":35}
+INFO Sending ms.Reply to node 1
+Lector_2 {"Lector_2":36, "Lector_1":35}
+INFO Esperando un mensaje 
+Lector_2 {"Lector_2":37, "Lector_1":46}
+INFO Received Message
+Lector_2 {"Lector_2":38, "Lector_1":46}
+INFO Received FINISH from nodo 1
+Lector_2 {"Lector_1":46, "Lector_2":39}
+INFO Esperando un mensaje 
+Lector_2 {"Lector_2":40, "Lector_1":46}
+INFO Finishing the Lector 2
