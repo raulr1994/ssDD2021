@@ -1,0 +1,10 @@
+Escritor_1 {"Escritor_1":1}
+Initialization Complete
+Escritor_1 {"Escritor_1":2}
+INFO Process listening at 192.168.1.1:30000
+Escritor_1 {"Escritor_1":3}
+INFO Enviando REQUEST al nodo 2
+Escritor_1 {"Escritor_1":4}
+INFO Process conecting at 192.168.1.2:30000
+Escritor_1 {"Escritor_1":5}
+INFO Esperando un mensaje 
