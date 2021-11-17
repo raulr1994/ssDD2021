@@ -1,0 +1,72 @@
+Escritor_3 {"Escritor_3":1}
+Initialization Complete
+Escritor_3 {"Escritor_3":2}
+INFO Enviando REQUEST al nodo 1
+Escritor_3 {"Escritor_3":3}
+INFO Process conecting at 192.168.1.1:30000
+Escritor_3 {"Escritor_3":4}
+INFO Esperando un mensaje 
+Escritor_3 {"Escritor_3":5}
+INFO Process listening at 192.168.1.3:30000
+Escritor_3 {"Escritor_3":6}
+INFO Sending ms.Request to node 1
+Escritor_3 {"Escritor_3":7}
+INFO Enviando REQUEST al nodo 2
+Escritor_3 {"Escritor_3":8}
+INFO Process conecting at 192.168.1.2:30000
+Escritor_3 {"Escritor_3":9}
+INFO Sending ms.Request to node 2
+Escritor_3 {"Escritor_3":10}
+INFO Waitting by Writter3 for  1 replies
+Escritor_3 {"Escritor_3":11, "Lector_2":9}
+INFO Received Message
+Escritor_3 {"Escritor_3":12, "Lector_2":9}
+INFO Received REQUEST from nodo 2
+Escritor_3 {"Escritor_3":13, "Lector_2":9}
+INFO Acepto la superioridad del nodo 2
+Escritor_3 {"Lector_2":9, "Escritor_3":14}
+INFO Process conecting at 192.168.1.2:30000
+Escritor_3 {"Escritor_3":15, "Lector_2":9}
+INFO Sending ms.Reply to node 2
+Escritor_3 {"Escritor_3":16, "Lector_2":9}
+INFO Esperando un mensaje 
+Escritor_3 {"Escritor_1":13, "Escritor_3":17, "Lector_2":9}
+INFO Received Message
+Escritor_3 {"Escritor_3":18, "Lector_2":9, "Escritor_1":13}
+INFO Received REQUEST from nodo 1
+Escritor_3 {"Escritor_3":19, "Lector_2":9, "Escritor_1":13}
+INFO Acepto la superioridad del nodo 1
+Escritor_3 {"Escritor_3":20, "Lector_2":9, "Escritor_1":13}
+INFO Process conecting at 192.168.1.1:30000
+Escritor_3 {"Escritor_3":21, "Lector_2":9, "Escritor_1":13}
+INFO Sending ms.Reply to node 1
+Escritor_3 {"Escritor_3":22, "Lector_2":9, "Escritor_1":13}
+INFO Esperando un mensaje 
+Escritor_3 {"Escritor_3":23, "Lector_2":17, "Escritor_1":32}
+INFO Received Message
+Escritor_3 {"Lector_2":17, "Escritor_1":32, "Escritor_3":24}
+INFO Received REPLY from nodo 1
+Escritor_3 {"Escritor_3":25, "Lector_2":17, "Escritor_1":38}
+INFO Received Message
+Escritor_3 {"Lector_2":17, "Escritor_1":38, "Escritor_3":26}
+INFO Received REQUEST from nodo 1
+Escritor_3 {"Lector_2":17, "Escritor_1":38, "Escritor_3":27}
+INFO Esperando un mensaje 
+Escritor_3 {"Escritor_3":28, "Lector_2":17, "Escritor_1":38}
+INFO Soy superior al nodo 1
+Escritor_3 {"Escritor_3":29, "Lector_2":17, "Escritor_1":38}
+INFO Esperando un mensaje 
+Escritor_3 {"Escritor_3":30, "Lector_2":39, "Escritor_1":38}
+INFO Received Message
+Escritor_3 {"Escritor_1":38, "Escritor_3":31, "Lector_2":39}
+INFO Received REPLY from nodo 2
+Escritor_3 {"Escritor_3":32, "Lector_2":45, "Escritor_1":38}
+INFO Received Message
+Escritor_3 {"Escritor_3":33, "Lector_2":45, "Escritor_1":38}
+INFO Received REQUEST from nodo 2
+Escritor_3 {"Escritor_3":34, "Lector_2":45, "Escritor_1":38}
+INFO Esperando un mensaje 
+Escritor_3 {"Escritor_3":35, "Lector_2":45, "Escritor_1":38}
+INFO Soy superior al nodo 2
+Escritor_3 {"Escritor_3":36, "Lector_2":45, "Escritor_1":38}
+INFO Esperando un mensaje 
