@@ -1,0 +1,178 @@
+Lector_3 {"Lector_3":1}
+Initialization Complete
+Lector_3 {"Lector_3":2}
+INFO Enviando REQUEST al nodo 1
+Lector_3 {"Lector_3":3}
+INFO Process conecting at 192.168.1.1:30000
+Lector_3 {"Lector_3":4}
+INFO Esperando un mensaje 
+Lector_3 {"Lector_3":5}
+INFO Process listening at 192.168.1.3:30000
+Lector_3 {"Lector_3":6, "Escritor_1":9}
+INFO Received Message
+Lector_3 {"Lector_3":7, "Escritor_1":9}
+INFO Received REQUEST from nodo 1
+Lector_3 {"Lector_3":8, "Escritor_1":9, "Escritor_2":11}
+INFO Received Message
+Lector_3 {"Lector_3":9, "Escritor_1":9, "Escritor_2":11}
+INFO Received REQUEST from nodo 2
+Lector_3 {"Escritor_2":11, "Lector_3":10, "Escritor_1":9}
+INFO Sending ms.Request to node 1
+Lector_3 {"Escritor_1":9, "Escritor_2":11, "Lector_3":11}
+INFO Enviando REQUEST al nodo 2
+Lector_3 {"Lector_3":12, "Escritor_1":9, "Escritor_2":11}
+INFO Process conecting at 192.168.1.2:30000
+Lector_3 {"Escritor_2":11, "Lector_3":13, "Escritor_1":9}
+INFO Sending ms.Request to node 2
+Lector_3 {"Lector_3":14, "Escritor_1":9, "Escritor_2":11}
+INFO Enviando REQUEST al nodo 4
+Lector_3 {"Lector_3":15, "Escritor_1":9, "Escritor_2":11}
+INFO Process conecting at 192.168.1.4:30000
+Lector_3 {"Escritor_2":11, "Lector_3":16, "Escritor_1":9}
+INFO Sending ms.Request to node 4
+Lector_3 {"Lector_3":17, "Escritor_1":9, "Escritor_2":11}
+INFO Waitting by Writter3 for  3 replies
+Lector_3 {"Escritor_1":16, "Escritor_2":11, "Lector_4":14, "Lector_3":18}
+INFO Received Message
+Lector_3 {"Escritor_2":11, "Lector_4":14, "Lector_3":19, "Escritor_1":16}
+INFO Received REQUEST from nodo 4
+Lector_3 {"Escritor_1":16, "Escritor_2":11, "Lector_4":14, "Lector_3":20}
+INFO Acepto la superioridad del nodo 1
+Lector_3 {"Lector_3":21, "Escritor_1":16, "Escritor_2":11, "Lector_4":14}
+INFO Process conecting at 192.168.1.1:30000
+Lector_3 {"Escritor_2":11, "Lector_4":14, "Lector_3":22, "Escritor_1":16}
+INFO Sending ms.Reply to node 1
+Lector_3 {"Escritor_2":11, "Lector_4":14, "Lector_3":23, "Escritor_1":16}
+INFO Esperando un mensaje 
+Lector_3 {"Escritor_1":16, "Escritor_2":11, "Lector_4":14, "Lector_3":24}
+INFO Acepto la superioridad del nodo 2
+Lector_3 {"Escritor_1":16, "Escritor_2":11, "Lector_4":14, "Lector_3":25}
+INFO Process conecting at 192.168.1.2:30000
+Lector_3 {"Lector_3":26, "Escritor_1":16, "Escritor_2":11, "Lector_4":14}
+INFO Sending ms.Reply to node 2
+Lector_3 {"Lector_3":27, "Escritor_1":16, "Escritor_2":11, "Lector_4":14}
+INFO Esperando un mensaje 
+Lector_3 {"Lector_4":14, "Lector_3":28, "Escritor_1":16, "Escritor_2":11}
+INFO Acepto la superioridad del nodo 4
+Lector_3 {"Lector_3":29, "Escritor_1":16, "Escritor_2":11, "Lector_4":14}
+INFO Process conecting at 192.168.1.4:30000
+Lector_3 {"Lector_3":30, "Escritor_1":16, "Escritor_2":11, "Lector_4":14}
+INFO Sending ms.Reply to node 4
+Lector_3 {"Lector_3":31, "Escritor_1":16, "Escritor_2":11, "Lector_4":14}
+INFO Esperando un mensaje 
+Lector_3 {"Escritor_2":16, "Lector_4":32, "Lector_3":32, "Escritor_1":16}
+INFO Received Message
+Lector_3 {"Lector_3":33, "Escritor_1":16, "Escritor_2":16, "Lector_4":32}
+INFO Received REPLY from nodo 4
+Lector_3 {"Lector_3":34, "Escritor_1":16, "Escritor_2":16, "Lector_4":32}
+INFO Esperando un mensaje 
+Lector_3 {"Lector_3":35, "Escritor_1":42, "Escritor_2":26, "Lector_4":32}
+INFO Received Message
+Lector_3 {"Escritor_1":42, "Escritor_2":26, "Lector_4":32, "Lector_3":36}
+INFO Received REPLY from nodo 1
+Lector_3 {"Escritor_1":52, "Escritor_2":26, "Lector_4":32, "Lector_3":37}
+INFO Received Message
+Lector_3 {"Escritor_1":52, "Escritor_2":26, "Lector_4":32, "Lector_3":38}
+INFO Received FINISH from nodo 1
+Lector_3 {"Escritor_1":52, "Escritor_2":26, "Lector_4":32, "Lector_3":39}
+INFO Esperando un mensaje 
+Lector_3 {"Lector_3":40, "Escritor_1":52, "Escritor_2":26, "Lector_4":32}
+INFO Esperando un mensaje 
+Lector_3 {"Lector_3":41, "Escritor_1":52, "Escritor_2":44, "Lector_4":32}
+INFO Received Message
+Lector_3 {"Lector_4":32, "Lector_3":42, "Escritor_1":52, "Escritor_2":44}
+INFO Received REPLY from nodo 2
+Lector_3 {"Lector_3":43, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Received Message
+Lector_3 {"Lector_3":44, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Received FINISH from nodo 2
+Lector_3 {"Lector_4":32, "Lector_3":45, "Escritor_1":52, "Escritor_2":54}
+INFO Esperando un mensaje 
+Lector_3 {"Escritor_2":54, "Lector_4":32, "Lector_3":46, "Escritor_1":52}
+INFO Esperando un mensaje 
+Lector_3 {"Escritor_1":52, "Escritor_2":54, "Lector_4":32, "Lector_3":47}
+INFO Entering to SC by Lector 3 and reading
+Lector_3 {"Lector_4":32, "Lector_3":48, "Escritor_1":52, "Escritor_2":54}
+INFO 
+0Escrito por el escritor 1
+0Escrito por el escritor 2
+
+Lector_3 {"Lector_3":49, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Exiting from SC by Lector3and free the SC 3
+Lector_3 {"Lector_3":50, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Enviando REQUEST al nodo 1
+Lector_3 {"Lector_3":51, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Process conecting at 192.168.1.1:30000
+Lector_3 {"Lector_3":52, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Sending ms.Request to node 1
+Lector_3 {"Lector_3":53, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Enviando REQUEST al nodo 2
+Lector_3 {"Lector_3":54, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Process conecting at 192.168.1.2:30000
+Lector_3 {"Lector_4":32, "Lector_3":55, "Escritor_1":52, "Escritor_2":54}
+INFO Sending ms.Request to node 2
+Lector_3 {"Lector_3":56, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Enviando REQUEST al nodo 4
+Lector_3 {"Lector_3":57, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Process conecting at 192.168.1.4:30000
+Lector_3 {"Lector_3":58, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Sending ms.Request to node 4
+Lector_3 {"Lector_3":59, "Escritor_1":52, "Escritor_2":54, "Lector_4":32}
+INFO Waitting by Writter3 for  3 replies
+Lector_3 {"Escritor_1":64, "Escritor_2":54, "Lector_4":32, "Lector_3":60}
+INFO Received Message
+Lector_3 {"Escritor_2":54, "Lector_4":32, "Lector_3":61, "Escritor_1":64}
+INFO Received REPLY from nodo 1
+Lector_3 {"Lector_3":62, "Escritor_1":64, "Escritor_2":54, "Lector_4":32}
+INFO Esperando un mensaje 
+Lector_3 {"Lector_3":63, "Escritor_1":64, "Escritor_2":57, "Lector_4":51}
+INFO Received Message
+Lector_3 {"Lector_3":64, "Escritor_1":64, "Escritor_2":57, "Lector_4":51}
+INFO Received REPLY from nodo 4
+Lector_3 {"Escritor_1":64, "Escritor_2":57, "Lector_4":51, "Lector_3":65}
+INFO Esperando un mensaje 
+Lector_3 {"Lector_4":62, "Lector_3":66, "Escritor_1":64, "Escritor_2":65}
+INFO Received Message
+Lector_3 {"Lector_3":67, "Escritor_1":64, "Escritor_2":65, "Lector_4":62}
+INFO Received REPLY from nodo 2
+Lector_3 {"Lector_3":68, "Escritor_1":64, "Escritor_2":65, "Lector_4":65}
+INFO Received Message
+Lector_3 {"Lector_3":69, "Escritor_1":64, "Escritor_2":65, "Lector_4":65}
+INFO Received FINISH from nodo 4
+Lector_3 {"Lector_3":70, "Escritor_1":64, "Escritor_2":65, "Lector_4":65}
+INFO Esperando un mensaje 
+Lector_3 {"Lector_4":65, "Lector_3":71, "Escritor_1":64, "Escritor_2":65}
+INFO Esperando un mensaje 
+Lector_3 {"Lector_4":65, "Lector_3":72, "Escritor_1":64, "Escritor_2":65}
+INFO Entering to SC by Lector 3 and reading
+Lector_3 {"Escritor_2":65, "Lector_4":65, "Lector_3":73, "Escritor_1":64}
+INFO 
+0Escrito por el escritor 1
+0Escrito por el escritor 2
+
+Lector_3 {"Lector_3":74, "Escritor_1":64, "Escritor_2":65, "Lector_4":65}
+INFO Exiting from SC by Lector3and free the SC 3
+Lector_3 {"Lector_3":75, "Escritor_1":64, "Escritor_2":65, "Lector_4":65}
+INFO Sending signal ending by Writter3 to all
+Lector_3 {"Lector_4":65, "Lector_3":76, "Escritor_1":64, "Escritor_2":65}
+INFO Enviando finish al nodo 1
+Lector_3 {"Lector_3":77, "Escritor_1":64, "Escritor_2":65, "Lector_4":65}
+INFO Process conecting at 192.168.1.1:30000
+Lector_3 {"Escritor_2":65, "Lector_4":65, "Lector_3":78, "Escritor_1":64}
+INFO Sending ms.Finish to node 1
+Lector_3 {"Lector_3":79, "Escritor_1":64, "Escritor_2":65, "Lector_4":65}
+INFO Enviando finish al nodo 2
+Lector_3 {"Escritor_2":65, "Lector_4":65, "Lector_3":80, "Escritor_1":64}
+INFO Process conecting at 192.168.1.2:30000
+Lector_3 {"Lector_4":65, "Lector_3":81, "Escritor_1":64, "Escritor_2":65}
+INFO Sending ms.Finish to node 2
+Lector_3 {"Lector_3":82, "Escritor_1":64, "Escritor_2":65, "Lector_4":65}
+INFO Enviando finish al nodo 4
+Lector_3 {"Escritor_1":64, "Escritor_2":65, "Lector_4":65, "Lector_3":83}
+INFO Process conecting at 192.168.1.4:30000
+Lector_3 {"Lector_3":84, "Escritor_1":64, "Escritor_2":65, "Lector_4":65}
+INFO Sending ms.Finish to node 4
+Lector_3 {"Lector_3":85, "Escritor_1":64, "Escritor_2":65, "Lector_4":65}
+INFO Waitting by ending Writter 3
+Lector_3 {"Escritor_2":65, "Lector_4":65, "Lector_3":86, "Escritor_1":64}
+INFO Finishing the Lector 3
