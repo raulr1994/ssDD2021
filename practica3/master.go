@@ -51,7 +51,7 @@ func sendRequestToWorker(endpoint string, interval com.TPInterval, reply *[]int)
 }
 
 
-func (p *PrimesImpl) FindPrimesToWorker(interval com.TPInterval, primeList *[]int) error {
+func (p *PrimesImpl) FindPrimes(interval com.TPInterval, primeList *[]int) error {
 		//Tener en cuenta aqui que luego el worker podría caerse
 		//Elegir al primer worker que esté disponible todos funcionan de forma ininterrumpida
 		var primes []int
