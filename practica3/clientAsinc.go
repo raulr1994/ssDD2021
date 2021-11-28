@@ -26,7 +26,7 @@ func checkError(err error) {
 	}
 }
 
-func handleRequests(responeChannel chan *rpc.Call) {
+/*func handleRequests(responeChannel chan *rpc.Call) {
     for {
         select {
             case reply := <- responeChannel:
@@ -38,13 +38,13 @@ func handleRequests(responeChannel chan *rpc.Call) {
 				
         }
     }
-}
+}*/
 
 // sendRequest realiza una petición RPC al servidor. Cada petición 
 // envía únicamente el intervalo en el cual se desea que el servidor encuentre los
 // números primos. La invocación RPC devuelve un slice de enteros
 // sendRequest escribe por pantalla id_peticion tiempo_observado
-func sendRequest(endpoint string, id int, interval com.TPInterval, wg *sync.WaitGroup, timeout int, retry int, responeChannel chan *rpc.Call){
+func sendRequest(endpoint string, id int, interval com.TPInterval, wg *sync.WaitGroup, timeout int, retry int){
     defer wg.Done()
 	start := time.Now()
 	client, err := rpc.DialHTTP("tcp", endpoint)
@@ -52,17 +52,16 @@ func sendRequest(endpoint string, id int, interval com.TPInterval, wg *sync.Wait
 		log.Fatal("dialing:", err)
 	}
 
-	quotient := new(Quotient)
-	primesCall := client.Go("PrimesImpl.FindPrimes" , interval, quotient, nil) //Llamada asíncrona RPC
+	var reply []int
+	primesCall := client.Go("PrimesImpl.FindPrimes" , interval, &reply, nil) //Llamada asíncrona RPC
+	//replyDone := <- primesCall.Done
+	//fmt.Println(replyDone.Args.(com.TPInterval))
 	select {
-			case reply <- primesCall.Done
-			fmt.Println(reply)
+			case <- primesCall.Done:
+				fmt.Println(id, " ", time.Since(start))
+			case <- time.After(timeout^retry*1.2*time.Second)
+				fmt.Println("Error")
 	}
-	/*if PrimesCall != nil {
-		log.Fatal("primes error:", err)
-		
-	}*/
-	fmt.Println(id, " ", time.Since(start))
 }
 
 func receiveReply(){
